@@ -1,0 +1,9 @@
+projectName: field-slicer
+pythonProjectVersion: 0.2.0
+webAppProjectVersion: 0.2.0
+projectAuthor: Jeremy Magland and Jeff Soules
+projectAuthorEmail: jmagland@flatironinstitute.org
+projectDescription: View 3D vector fields using figurl
+projectUrl: https://github.com/magland/field-slicer
+projectBugTrackerUrl: https://github.com/magland/field-slicer/issues
+pythonPackageDir: .
