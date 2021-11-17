@@ -11,7 +11,7 @@ def main():
     a[1, :, :, :] = np.sin((iy + iz - ix) * 2 * np.pi)
     a[2, :, :, :] = np.sin((ix + iz - iy) * 2 * np.pi)
 
-    F = fs.view_volume(a, channel_names=['channel 1', 'channel 2', 'channel 3'])
+    F = fs.create_volume_view(a, channel_names=['channel 1', 'channel 2', 'channel 3'])
     url = F.url(label='Test field slicer')
     print(url)
 

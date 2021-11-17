@@ -2,7 +2,7 @@ from typing import List
 import numpy as np
 import figurl as fig
 
-def view_volume(v: np.ndarray, *, channel_names: List[str]):
+def create_volume_view(v: np.ndarray, *, channel_names: List[str]):
     assert v.ndim == 4, 'Array must be 4-dimensional (first dimension is channels)'
     num_channels = v.shape[0]
     nx = v.shape[1]
