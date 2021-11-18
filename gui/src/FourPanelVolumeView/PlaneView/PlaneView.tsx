@@ -3,7 +3,7 @@ import React, { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import PlaneDataView from './PlaneDataView';
 import PlaneFrameView from './PlaneFrameView';
 
-type Plane = 'XY' | 'XZ' | 'YZ'
+export type Plane = 'XY' | 'XZ' | 'YZ'
 
 type Props = {
     volumeData: number[][][][]
@@ -172,6 +172,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
                 <PlaneFrameView
                     width={innerWidth}
                     height={innerHeight}
+                    plane={plane}
                 />
             </div>
         </div>

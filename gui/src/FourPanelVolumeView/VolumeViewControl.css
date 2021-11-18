@@ -17,6 +17,7 @@
 
 .VolumeViewControlTable .MuiTableCell-body {
     color: gray;
+    font-size: 17px;
 }
 
 .VolumeViewControlTable .noselect {

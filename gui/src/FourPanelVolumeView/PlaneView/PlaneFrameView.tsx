@@ -1,33 +1,53 @@
 import BaseCanvas from 'FigurlCanvas/BaseCanvas';
 import React, { FunctionComponent, useMemo } from 'react';
+import { Plane } from './PlaneView';
 
 type Props = {
     width: number
     height: number
+    plane: Plane
 }
 
 type PaintProps = {
     width: number
     height: number
+    plane: Plane
 }
 
 const paint = (context: CanvasRenderingContext2D, props: PaintProps) => {
-    const {width, height} = props
+    const {width, height, plane} = props
     // context.fillStyle = 'rgb(215, 215, 245)'
     // context.fillRect(0, 0, width, height)
 
     context.fillStyle = 'rgba(0,0,0,0)'
     context.fillRect(0, 0, width, height)
 
-    context.strokeStyle = 'blue'
-    drawLine(context, width / 2, 0, width / 2, height)
+    context.strokeStyle = colorFromDirection(plane[0])
     drawLine(context, 0, height / 2, width, height / 2)
+    
+    context.strokeStyle = colorFromDirection(plane[1])
+    drawLine(context, width / 2, 0, width / 2, height)
 }
 
-const PlaneFrameView: FunctionComponent<Props> = ({width, height}) => {
-    const paintProps = useMemo(() => ({width, height}), [width, height])
+const colorFromDirection = (a: string) => {
+    if (a === 'X') return 'red'
+    else if (a === 'Y') return 'green'
+    else if (a === 'Z') return 'blue'
+    return 'white'
+}
+
+const planeLabelStyle: React.CSSProperties = {
+    color: 'lightgray',
+    padding: 15,
+    fontSize: 25,
+    userSelect: 'none'
+}
+
+const PlaneFrameView: FunctionComponent<Props> = ({width, height, plane}) => {
+    const paintProps = useMemo(() => ({width, height, plane}), [width, height, plane])
     return (
         <div>
+            <div style={planeLabelStyle}>{plane}</div>
             <BaseCanvas<PaintProps>
                 width={width}
                 height={height}
