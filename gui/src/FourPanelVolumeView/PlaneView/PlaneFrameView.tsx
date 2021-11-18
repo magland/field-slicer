@@ -23,10 +23,10 @@ const paint = (context: CanvasRenderingContext2D, props: PaintProps) => {
     context.fillRect(0, 0, width, height)
 
     context.strokeStyle = colorFromDirection(plane[0])
-    drawLine(context, 0, height / 2, width, height / 2)
+    drawLine(context, width / 2, height / 2, width, height / 2)
     
     context.strokeStyle = colorFromDirection(plane[1])
-    drawLine(context, width / 2, 0, width / 2, height)
+    drawLine(context, width / 2, height / 2, width / 2, 0)
 }
 
 const colorFromDirection = (a: string) => {

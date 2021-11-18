@@ -23,3 +23,11 @@
 .VolumeViewControlTable .noselect {
     user-select: none;
 }
+
+.VolumeViewControlTable .MuiRadio-colorSecondary.Mui-checked {
+    color: gray
+}
+
+.VolumeViewControlTable .MuiRadio-root {
+    color: gray
+}

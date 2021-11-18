@@ -109,7 +109,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
     const childDivStyle: React.CSSProperties = useMemo(() => ({
         position: 'absolute',
         left: innerWidth / 2 - focus12[0] * scale,
-        top: innerHeight / 2 - focus12[1] * scale,
+        top: innerHeight / 2 - (N2 - 1 - focus12[1]) * scale,
         width: N1 * scale,
         height: N2 * scale
     }), [N1, N2, focus12, innerWidth, innerHeight, scale])
@@ -132,7 +132,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
         if (!f) return
         const p = [e.clientX, e.clientY]
         const dx = a[0] - p[0]
-        const dy = a[1] - p[1]
+        const dy = -(a[1] - p[1])
         setFocus12([f[0] + Math.floor(dx / scale), f[1] + Math.floor(dy / scale)])
     }, [setFocus12, scale])
     const handleMouseLeave = useCallback((e: React.MouseEvent) => {
@@ -143,9 +143,11 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
         const element = e.currentTarget
         const x = e.clientX - element.getBoundingClientRect().x
         const y = e.clientY - element.getBoundingClientRect().y
-        const p12: [number, number] = [Math.floor(focus12[0] + (x - innerWidth / 2) / scale), Math.floor(focus12[1] + (y - innerHeight / 2) / scale)]
+        const x0 = Math.floor(focus12[0] + (x - innerWidth / 2) / scale)
+        const y0 = N2 - 1 - Math.floor((N2 -1 - focus12[1]) + (y - innerHeight / 2) / scale)
+        const p12: [number, number] = [x0, y0]
         setFocus12(p12)
-    }, [focus12, setFocus12, scale, innerWidth, innerHeight])
+    }, [focus12, setFocus12, scale, innerWidth, innerHeight, N2])
 
     return (
         <div
