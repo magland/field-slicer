@@ -4,14 +4,14 @@ import VolumeViewControl from './VolumeViewControl';
 
 type Props = {
     volumeData: number[][][][]
-    channelNames: string[]
+    componentNames: string[]
     width: number
     height: number
 }
 
 export type Coord3 = [number, number, number]
 
-const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames, width, height}) => {
+const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNames, width, height}) => {
     const W = width / 2
     const H = height / 2
     const style0: React.CSSProperties = useMemo(() => ({
@@ -30,7 +30,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames
         position: 'absolute', width: W, height: H, left: W, top: H
     }), [W, H])
     const [focusPosition, setFocusPosition] = useState<Coord3>([0, 0, 0])
-    const [channelIndex, setChannelIndex] = useState<number>(0)
+    const [componentIndex, setComponentIndex] = useState<number>(0)
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -59,9 +59,9 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames
             <div style={style1}>
                 <VolumeViewControl
                     volumeData={volumeData}
-                    channelNames={channelNames}
-                    channelIndex={channelIndex}
-                    setChannelIndex={setChannelIndex}
+                    componentNames={componentNames}
+                    componentIndex={componentIndex}
+                    setComponentIndex={setComponentIndex}
                     focusPosition={focusPosition}
                     setFocusPosition={setFocusPosition}
                     valueRange={valueRange}
@@ -72,7 +72,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames
             <div style={style2}>
                 <PlaneView
                     volumeData={volumeData}
-                    channelIndex={channelIndex}
+                    componentIndex={componentIndex}
                     plane="XY"
                     focusPosition={focusPosition}
                     setFocusPosition={setFocusPosition}
@@ -85,7 +85,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames
             <div style={style3}>
                 <PlaneView
                     volumeData={volumeData}
-                    channelIndex={channelIndex}
+                    componentIndex={componentIndex}
                     plane="YZ"
                     focusPosition={focusPosition}
                     setFocusPosition={setFocusPosition}
@@ -98,7 +98,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, channelNames
             <div style={style4}>
                 <PlaneView
                     volumeData={volumeData}
-                    channelIndex={channelIndex}
+                    componentIndex={componentIndex}
                     plane="XZ"
                     focusPosition={focusPosition}
                     setFocusPosition={setFocusPosition}

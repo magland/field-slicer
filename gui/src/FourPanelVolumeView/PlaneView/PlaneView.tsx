@@ -7,7 +7,7 @@ type Plane = 'XY' | 'XZ' | 'YZ'
 
 type Props = {
     volumeData: number[][][][]
-    channelIndex: number
+    componentIndex: number
     plane: Plane
     focusPosition: Coord3
     setFocusPosition: (p: Coord3) => void
@@ -23,12 +23,12 @@ type DragState = {
     anchorFocusPoint?: [number, number]
 }
 
-const PlaneView: FunctionComponent<Props> = ({volumeData, channelIndex, plane, focusPosition, setFocusPosition, valueRange, width, height, scale}) => {
+const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane, focusPosition, setFocusPosition, valueRange, width, height, scale}) => {
     const {Nx, Ny, Nz} = useMemo(() => {
         return {Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
     const {N1, N2, planeData, focus12, setFocus12} = useMemo(() => {
-        const c = channelIndex
+        const c = componentIndex
         if (plane === 'XY') {
             const N1 = Nx
             const N2 = Ny
@@ -86,7 +86,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, channelIndex, plane, f
         else {
             throw Error('Unexpected')
         }
-    }, [volumeData, channelIndex, plane, focusPosition, setFocusPosition, Nx, Ny, Nz])
+    }, [volumeData, componentIndex, plane, focusPosition, setFocusPosition, Nx, Ny, Nz])
     const parentDivStyle: React.CSSProperties = useMemo(() => ({
         position: 'absolute',
         width,

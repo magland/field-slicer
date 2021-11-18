@@ -1,16 +1,16 @@
 import { getFigureData, useWindowDimensions } from 'figurl';
 import React, { useEffect, useState } from 'react';
-import FieldSlicerView from './FieldSlicerView';
-import FieldSlicerViewData, { isFieldSlicerViewData } from './FieldSlicerViewData';
+import VolumeView from './VolumeView';
+import VolumeViewData, { isVolumeViewData } from './VolumeViewData';
 
 function App() {
-  const [data, setData] = useState<FieldSlicerViewData>()
+  const [data, setData] = useState<VolumeViewData>()
   const [errorMessage, setErrorMessage] = useState<string>()
   const {width, height} = useWindowDimensions()
 
   useEffect(() => {
     getFigureData().then((data: any) => {
-      if (!isFieldSlicerViewData(data)) {
+      if (!isVolumeViewData(data)) {
         setErrorMessage(`Invalid figure data`)
         console.error('Invalid figure data', data)
         return
@@ -31,7 +31,7 @@ function App() {
   }
 
   return (
-    <FieldSlicerView
+    <VolumeView
       data={data}
       width={width - 10}
       height={height - 5}

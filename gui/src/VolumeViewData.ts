@@ -2,18 +2,18 @@ import { validateObject } from "figurl"
 import { isEqualTo } from "figurl/viewInterface/kacheryTypes"
 import { isArrayOf, isString } from "figurl/viewInterface/validateObject"
 
-type FieldSlicerViewData = {
-    type: 'volume'
+type VolumeViewData = {
+    type: 'volume3d'
     data: number[][][][]
-    channelNames: string[]
+    componentNames: string[]
 }
 
-export const isFieldSlicerViewData = (x: any): x is FieldSlicerViewData => {
+export const isVolumeViewData = (x: any): x is VolumeViewData => {
     return validateObject(x, {
-        type: isEqualTo('volume'),
+        type: isEqualTo('volume3d'),
         data: () => (true),
-        channelNames: isArrayOf(isString)
+        componentNames: isArrayOf(isString)
     }, {allowAdditionalFields: true})
 }
 
-export default FieldSlicerViewData
+export default VolumeViewData

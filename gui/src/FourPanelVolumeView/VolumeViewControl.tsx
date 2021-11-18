@@ -1,14 +1,14 @@
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
-import ChannelSelect from './ChannelSelect';
+import ComponentSelect from './ComponentSelect';
 import { Coord3 } from './FourPanelVolumeView';
 import "./VolumeViewControl.css"
 
 type Props = {
     volumeData: number[][][][]
-    channelNames: string[]
-    channelIndex: number
-    setChannelIndex: (c: number) => void
+    componentNames: string[]
+    componentIndex: number
+    setComponentIndex: (c: number) => void
     focusPosition: Coord3
     setFocusPosition: (p: Coord3) => void
     valueRange: [number, number]
@@ -16,12 +16,12 @@ type Props = {
     setScale: (s: number) => void
 }
 
-const VolumeViewControl: FunctionComponent<Props> = ({volumeData, channelNames, channelIndex, setChannelIndex, focusPosition, setFocusPosition, valueRange, scale, setScale}) => {
+const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, valueRange, scale, setScale}) => {
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
     const currentValue = useMemo(() => {
-        const c = channelIndex
+        const c = componentIndex
         const x = focusPosition[0]
         const y = focusPosition[1]
         const z = focusPosition[2]
@@ -30,7 +30,7 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, channelNames, 
         if ((y < 0) || (y >= Ny)) return
         if ((z < 0) || (z >= Nz)) return
         return volumeData[c][x][y][z]
-    }, [Nc, Nx, Ny, Nz, channelIndex, focusPosition, volumeData])
+    }, [Nc, Nx, Ny, Nz, componentIndex, focusPosition, volumeData])
     const handleScaleUp = useCallback(() => {
         if (scale < 1) {
             const a = Math.round(1 / scale)
@@ -56,8 +56,8 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, channelNames, 
         <Table className="VolumeControlTable">
             <TableBody>
                 <TableRow>
-                    <TableCell>Channel</TableCell>
-                    <TableCell><ChannelSelect channelNames={channelNames} channelIndex={channelIndex} setChannelIndex={setChannelIndex} /></TableCell>
+                    <TableCell>Component</TableCell>
+                    <TableCell><ComponentSelect componentNames={componentNames} componentIndex={componentIndex} setComponentIndex={setComponentIndex} /></TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell>Position</TableCell>

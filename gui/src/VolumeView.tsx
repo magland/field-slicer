@@ -1,19 +1,19 @@
-import FieldSlicerViewData from 'FieldSlicerViewData';
+import VolumeViewData from 'VolumeViewData';
 import FourPanelVolumeView from 'FourPanelVolumeView/FourPanelVolumeView';
 import React, { FunctionComponent } from 'react';
 
 type Props = {
-    data: FieldSlicerViewData
+    data: VolumeViewData
     width: number
     height: number
 }
 
-const FieldSlicerView: FunctionComponent<Props> = ({data, width, height}) => {
-    if (data.type === 'volume') {
+const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
+    if (data.type === 'volume3d') {
         return (
             <FourPanelVolumeView
                 volumeData={data.data}
-                channelNames={data.channelNames}
+                componentNames={data.componentNames}
                 width={width}
                 height={height}
             />
@@ -24,4 +24,4 @@ const FieldSlicerView: FunctionComponent<Props> = ({data, width, height}) => {
     }
 }
 
-export default FieldSlicerView
+export default VolumeView
