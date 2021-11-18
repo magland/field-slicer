@@ -1,4 +1,4 @@
-import { MenuItem, Select } from '@material-ui/core';
+import { Radio } from '@material-ui/core';
 import React, { FunctionComponent, useCallback } from 'react';
 
 type Props = {
@@ -12,19 +12,16 @@ const ComponentSelect: FunctionComponent<Props> = ({componentNames, componentInd
         name?: string | undefined;
         value: unknown;
     }>) => {
-        setComponentIndex(e.target.value as number)
+        setComponentIndex(Number(e.target.value))
     }, [setComponentIndex])
     return (
-        <Select
-            value={componentIndex}
-            onChange={handleChange}
-        >
+        <div>
             {
                 componentNames.map((componentName, ii) => (
-                    <MenuItem value={ii}>{componentName}</MenuItem>
+                    <span key={ii}><Radio value={ii} checked={componentIndex === ii} onChange={handleChange} /> {componentName}</span>
                 ))
             }
-        </Select>
+        </div>
     )
 }
 

@@ -67,6 +67,8 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
                     valueRange={valueRange}
                     scale={scale}
                     setScale={setScale}
+                    width={W}
+                    height={H}
                 />
             </div>
             <div style={style2}>

@@ -1,4 +1,5 @@
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
+import Hyperlink from 'components/Hyperlink/Hyperlink';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import ComponentSelect from './ComponentSelect';
 import { Coord3 } from './FourPanelVolumeView';
@@ -14,9 +15,11 @@ type Props = {
     valueRange: [number, number]
     scale: number
     setScale: (s: number) => void
+    width: number
+    height: number
 }
 
-const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, valueRange, scale, setScale}) => {
+const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, valueRange, scale, setScale, width, height}) => {
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -52,31 +55,38 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames
     const handleResetPosition = useCallback(() => {
         setFocusPosition([Math.floor(Nx / 2), Math.floor(Ny / 2), Math.floor(Nz / 2)])
     }, [setFocusPosition, Nx, Ny, Nz])
+    const divStyle: React.CSSProperties = useMemo(() => ({
+        position: 'absolute',
+        width,
+        height
+    }), [width, height])
     return (
-        <Table className="VolumeControlTable">
-            <TableBody>
-                <TableRow>
-                    <TableCell>Component</TableCell>
-                    <TableCell><ComponentSelect componentNames={componentNames} componentIndex={componentIndex} setComponentIndex={setComponentIndex} /></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Position</TableCell>
-                    <TableCell>{focusPosition.map(a => (`${a}`)).join(', ')} <button onClick={handleResetPosition}>reset</button></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Value</TableCell>
-                    <TableCell>{currentValue !== undefined ? currentValue : ''}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Value range</TableCell>
-                    <TableCell>{`[${valueRange[0]}, ${valueRange[1]}]`}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Scale</TableCell>
-                    <TableCell>{scale} <button onClick={handleScaleUp}>+</button> <button onClick={handleScaleDown}>-</button></TableCell>
-                </TableRow>
-            </TableBody>
-        </Table>
+        <div className="VolumeViewControl" style={divStyle}>
+            <Table className="VolumeViewControlTable">
+                <TableBody>
+                    <TableRow>
+                        <TableCell>Component</TableCell>
+                        <TableCell><ComponentSelect componentNames={componentNames} componentIndex={componentIndex} setComponentIndex={setComponentIndex} /></TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Position</TableCell>
+                        <TableCell>[{focusPosition.map(a => (`${a}`)).join(', ')}] <span className="noselect"><Hyperlink onClick={handleResetPosition}>reset</Hyperlink></span></TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Value</TableCell>
+                        <TableCell>{currentValue !== undefined ? currentValue : ''}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Value range</TableCell>
+                        <TableCell>{`[${valueRange[0]}, ${valueRange[1]}]`}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Scale</TableCell>
+                        <TableCell>{scale} <span className="noselect"><Hyperlink onClick={handleScaleUp}>zoom in</Hyperlink> <Hyperlink onClick={handleScaleDown}>zoom out</Hyperlink></span></TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </div>
     )
 }
 

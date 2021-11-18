@@ -27,6 +27,9 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
     const {Nx, Ny, Nz} = useMemo(() => {
         return {Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
+    const margin = 8
+    const innerWidth = width - margin * 2
+    const innerHeight = height - margin * 2
     const {N1, N2, planeData, focus12, setFocus12} = useMemo(() => {
         const c = componentIndex
         if (plane === 'XY') {
@@ -87,19 +90,29 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
             throw Error('Unexpected')
         }
     }, [volumeData, componentIndex, plane, focusPosition, setFocusPosition, Nx, Ny, Nz])
-    const parentDivStyle: React.CSSProperties = useMemo(() => ({
+    const outerParentDivStyle: React.CSSProperties = useMemo(() => ({
         position: 'absolute',
         width,
         height,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        background: 'black'
     }), [width, height])
+    const innerParentDivStyle: React.CSSProperties = useMemo(() => ({
+        position: 'absolute',
+        left: margin,
+        top: margin,
+        width: innerWidth,
+        height: innerHeight,
+        overflow: 'hidden',
+        background: 'rgb(50,50,70)'
+    }), [innerWidth, innerHeight])
     const childDivStyle: React.CSSProperties = useMemo(() => ({
         position: 'absolute',
-        left: width / 2 - focus12[0] * scale,
-        top: height / 2 - focus12[1] * scale,
+        left: innerWidth / 2 - focus12[0] * scale,
+        top: innerHeight / 2 - focus12[1] * scale,
         width: N1 * scale,
         height: N2 * scale
-    }), [N1, N2, focus12, width, height, scale])
+    }), [N1, N2, focus12, innerWidth, innerHeight, scale])
 
     const dragState = useRef<DragState>({})
 
@@ -130,30 +143,35 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
         const element = e.currentTarget
         const x = e.clientX - element.getBoundingClientRect().x
         const y = e.clientY - element.getBoundingClientRect().y
-        const p12: [number, number] = [Math.floor(focus12[0] + (x - width / 2) / scale), Math.floor(focus12[1] + (y - height / 2) / scale)]
+        const p12: [number, number] = [Math.floor(focus12[0] + (x - innerWidth / 2) / scale), Math.floor(focus12[1] + (y - innerHeight / 2) / scale)]
         setFocus12(p12)
-    }, [focus12, setFocus12, scale, width, height])
+    }, [focus12, setFocus12, scale, innerWidth, innerHeight])
 
     return (
         <div
-            style={parentDivStyle}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-            onDoubleClick={handleDoubleClick}
+            style={outerParentDivStyle}
         >
-            <PlaneFrameView
-                width={width}
-                height={height}
-            />
-            <div style={childDivStyle}>
-                <PlaneDataView
-                    N1={N1}
-                    N2={N2}
-                    scale={scale}
-                    planeData={planeData}
-                    valueRange={valueRange}
+            <div
+                style={innerParentDivStyle}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                onMouseMove={handleMouseMove}
+                onDoubleClick={handleDoubleClick}
+            >
+                
+                <div style={childDivStyle}>
+                    <PlaneDataView
+                        N1={N1}
+                        N2={N2}
+                        scale={scale}
+                        planeData={planeData}
+                        valueRange={valueRange}
+                    />
+                </div>
+                <PlaneFrameView
+                    width={innerWidth}
+                    height={innerHeight}
                 />
             </div>
         </div>
