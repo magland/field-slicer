@@ -1,6 +1,6 @@
-import VolumeViewData from 'VolumeViewData';
-import FourPanelVolumeView from 'FourPanelVolumeView/FourPanelVolumeView';
 import React, { FunctionComponent } from 'react';
+import Volume3DView from 'Volume3DView/Volume3DView';
+import VolumeViewData from 'VolumeViewData';
 
 type Props = {
     data: VolumeViewData
@@ -11,7 +11,7 @@ type Props = {
 const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
     if (data.type === 'volume3d') {
         return (
-            <FourPanelVolumeView
+            <Volume3DView
                 volumeData={data.data}
                 componentNames={data.componentNames}
                 width={width}

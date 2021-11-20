@@ -1,17 +1,23 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import PlaneView from './PlaneView/PlaneView';
-import VolumeViewControl from './VolumeViewControl';
+import Volume3DScene from './Volume3DScene';
 
 type Props = {
     volumeData: number[][][][]
     componentNames: string[]
+    focusPosition: Coord3
+    setFocusPosition: (p: Coord3) => void
+    componentIndex: number
+    setComponentIndex: (c: number) => void
+    scale: number
+    setScale: (s: number) => void
     width: number
     height: number
 }
 
 export type Coord3 = [number, number, number]
 
-const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNames, width, height}) => {
+const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNames, width, height, focusPosition, setFocusPosition, componentIndex, setComponentIndex, scale, setScale}) => {
     const W = width / 2
     const H = height / 2
     const style0: React.CSSProperties = useMemo(() => ({
@@ -29,15 +35,11 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
     const style4: React.CSSProperties = useMemo(() => ({
         position: 'absolute', width: W, height: H, left: W, top: H
     }), [W, H])
-    const [focusPosition, setFocusPosition] = useState<Coord3>([0, 0, 0])
-    const [componentIndex, setComponentIndex] = useState<number>(0)
+    
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
-    const [scale, setScale] = useState<number>(4)
-    useEffect(() => {
-        setFocusPosition([Math.floor(Nx / 2), Math.floor(Ny / 2), Math.floor(Nz / 2)])
-    }, [Nx, Ny, Nz])
+    
     const {vMin, vMax} = useMemo(() => {
         let vMin = volumeData[0][0][0][0]
         let vMax = volumeData[0][0][0][0]
@@ -57,14 +59,13 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
     return (
         <div style={style0}>
             <div style={style1}>
-                <VolumeViewControl
+                <Volume3DScene
                     volumeData={volumeData}
                     componentNames={componentNames}
                     componentIndex={componentIndex}
                     setComponentIndex={setComponentIndex}
                     focusPosition={focusPosition}
                     setFocusPosition={setFocusPosition}
-                    valueRange={valueRange}
                     scale={scale}
                     setScale={setScale}
                     width={W}

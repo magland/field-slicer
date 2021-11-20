@@ -12,14 +12,13 @@ type Props = {
     setComponentIndex: (c: number) => void
     focusPosition: Coord3
     setFocusPosition: (p: Coord3) => void
-    valueRange: [number, number]
     scale: number
     setScale: (s: number) => void
     width: number
     height: number
 }
 
-const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, valueRange, scale, setScale, width, height}) => {
+const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, scale, setScale, width, height}) => {
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -55,13 +54,8 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames
     const handleResetPosition = useCallback(() => {
         setFocusPosition([Math.floor(Nx / 2), Math.floor(Ny / 2), Math.floor(Nz / 2)])
     }, [setFocusPosition, Nx, Ny, Nz])
-    const divStyle: React.CSSProperties = useMemo(() => ({
-        position: 'absolute',
-        width,
-        height
-    }), [width, height])
     return (
-        <div className="VolumeViewControl" style={divStyle}>
+        <div className="VolumeViewControl">
             <Table className="VolumeViewControlTable">
                 <TableBody>
                     <TableRow>
@@ -75,10 +69,6 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames
                     <TableRow>
                         <TableCell>Value</TableCell>
                         <TableCell>{currentValue !== undefined ? currentValue : ''}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Value range</TableCell>
-                        <TableCell>{`[${valueRange[0]}, ${valueRange[1]}]`}</TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>Scale</TableCell>
