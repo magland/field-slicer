@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import Volume3DView from 'Volume3DView/Volume3DView';
+import VectorFieldWidgetWrapper from 'VectorFieldWidget/VectorFieldWidgetWrapper';
 import VolumeViewData from 'VolumeViewData';
+import VolumeWidgetWrapper from 'VolumeWidget/VolumeWidgetWrapper';
 
 type Props = {
     data: VolumeViewData
@@ -9,18 +10,27 @@ type Props = {
 }
 
 const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
-    if (data.type === 'volume3d') {
+    if (data.type === 'volume') {
         return (
-            <Volume3DView
-                volumeData={data.data}
+            <VolumeWidgetWrapper
+                dataUri={data.dataUri}
                 componentNames={data.componentNames}
                 width={width}
                 height={height}
             />
         )
     }
+    else if (data.type === 'vector_field') {
+        return (
+            <VectorFieldWidgetWrapper
+                dataUri={data.dataUri}
+                width={width}
+                height={height}
+            />
+        )
+    }
     else {
-        return <div>Unexpected data type: {data.type}</div>
+        return <div>Unexpected data type</div>
     }
 }
 

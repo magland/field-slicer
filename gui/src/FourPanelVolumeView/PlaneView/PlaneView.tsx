@@ -181,6 +181,14 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
     )
 }
 
+export const allocateZeros4d = (N1: number, N2: number, N3: number, N4: number) => {
+    const ret: number[][][][] = []
+    for (let i1 = 0; i1 < N1; i1++) {
+        ret.push(allocateZeros3d(N2, N3, N4))
+    }
+    return ret
+}
+
 export const allocateZeros3d = (N1: number, N2: number, N3: number) => {
     const ret: number[][][] = []
     for (let i1 = 0; i1 < N1; i1++) {

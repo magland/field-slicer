@@ -11,8 +11,8 @@ def main():
     a[1, :, :, :] = np.sin((iy + iz - ix) * 4 * np.pi) * np.exp(-3 * (ix**2 + iy**2 + iz**2))
     a[2, :, :, :] = np.sin((ix + iz - iy) * 4 * np.pi) * np.exp(-3 * (ix**2 + iy**2 + iz**2))
 
-    F = vv.create_volume_view(a, component_names=['C1', 'C2', 'C3'])
-    url = F.url(label='Test volume view')
+    F = vv.create_vector_field_view(a)
+    url = F.url(label='Test vector field view')
     print(url)
 
 

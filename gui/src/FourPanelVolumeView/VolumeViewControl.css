@@ -2,6 +2,12 @@
     padding: 10px;
 }
 
+.VolumeViewControlTable {
+    width: 100%;
+    table-layout: fixed;
+    overflow-wrap: break-word;
+}
+
 .VolumeViewControlTable .MuiTableCell-root {
     padding-top: 5px;
     padding-bottom: 5px;

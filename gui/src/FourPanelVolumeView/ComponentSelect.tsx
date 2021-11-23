@@ -18,7 +18,7 @@ const ComponentSelect: FunctionComponent<Props> = ({componentNames, componentInd
         <div>
             {
                 componentNames.map((componentName, ii) => (
-                    <span key={ii}><Radio value={ii} checked={componentIndex === ii} onChange={handleChange} /> {componentName}&nbsp;&nbsp;&nbsp;</span>
+                    <span key={ii} style={{whiteSpace: 'nowrap'}}><Radio value={ii} checked={componentIndex === ii} onChange={handleChange} /> {componentName}&nbsp;&nbsp;&nbsp;</span>
                 ))
             }
         </div>

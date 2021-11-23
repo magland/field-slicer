@@ -10,7 +10,7 @@ type Props = {
     height: number
 }
 
-const Volume3DView: FunctionComponent<Props> = ({volumeData, componentNames, width, height}) => {
+const VolumeWidget: FunctionComponent<Props> = ({volumeData, componentNames, width, height}) => {
     const {Nx, Ny, Nz} = useMemo(() => {
         return {Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -54,4 +54,4 @@ const Volume3DView: FunctionComponent<Props> = ({volumeData, componentNames, wid
     )
 }
 
-export default Volume3DView
+export default VolumeWidget
