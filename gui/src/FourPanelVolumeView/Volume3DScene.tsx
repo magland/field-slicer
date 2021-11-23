@@ -132,15 +132,28 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
         const light = new THREE.HemisphereLight();
 		scene.add( light );
 
-        const animate = () => {
-            requestAnimationFrame( animate );
-            // cube.rotation.x += 0.01;
-            // cube.rotation.y += 0.01;
-            controls.update()
+        const render = () => {
             renderer.render( scene, camera );
-        };
-        animate();
+        }
+        controls.addEventListener( 'change', render );
+        controls.update()
+        render()
+
+        // let canceled = false
+        // const animate = () => {
+        //     if (canceled) return
+        //     requestAnimationFrame( animate );
+        //     // cube.rotation.x += 0.01;
+        //     // cube.rotation.y += 0.01;
+            
+        // };
+        // animate();
+
+        return () => {
+            controls.removeEventListener('change', render)
+        }
     }, [camera, container, controls, height, objects, width, scene])
+
     return (
         <div ref={setContainer} />
     )
