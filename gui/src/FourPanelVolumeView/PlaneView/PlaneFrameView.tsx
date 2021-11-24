@@ -19,8 +19,7 @@ const paint = (context: CanvasRenderingContext2D, props: PaintProps) => {
     // context.fillStyle = 'rgb(215, 215, 245)'
     // context.fillRect(0, 0, width, height)
 
-    context.fillStyle = 'rgba(0,0,0,0)'
-    context.fillRect(0, 0, width, height)
+    context.clearRect(0, 0, width, height)
 
     context.strokeStyle = colorFromDirection(plane[0])
     drawLine(context, width / 2, height / 2, width, height / 2)

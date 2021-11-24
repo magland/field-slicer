@@ -1,9 +1,15 @@
 import { Coord3 } from 'FourPanelVolumeView/FourPanelVolumeView';
 import React, { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import PlaneDataView from './PlaneDataView';
+import PlaneFieldArrowsView from './PlaneFieldArrowsView';
 import PlaneFrameView from './PlaneFrameView';
 
 export type Plane = 'XY' | 'XZ' | 'YZ'
+
+export type FieldArrowOpts = {
+    stride: number
+    scale: number
+}
 
 type Props = {
     volumeData: number[][][][]
@@ -15,6 +21,7 @@ type Props = {
     width: number
     height: number
     scale: number
+    fieldArrowOpts?: FieldArrowOpts
 }
 
 type DragState = {
@@ -23,7 +30,14 @@ type DragState = {
     anchorFocusPoint?: [number, number]
 }
 
-const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane, focusPosition, setFocusPosition, valueRange, width, height, scale}) => {
+export type FieldArrow = {
+    x: number
+    y: number
+    dx: number
+    dy: number
+}
+
+const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane, focusPosition, setFocusPosition, valueRange, width, height, scale, fieldArrowOpts}) => {
     const {Nx, Ny, Nz} = useMemo(() => {
         return {Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -93,6 +107,50 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
             throw Error('Unexpected')
         }
     }, [volumeData, componentIndex, plane, delayedFocusPosition, setFocusPosition, Nx, Ny, Nz])
+    const fieldArrows: FieldArrow[] = useMemo(() => {
+        const fieldArrows: FieldArrow[] = []
+        if (!fieldArrowOpts) return fieldArrows
+        const stride = fieldArrowOpts.stride
+        const stride2 = Math.floor(stride / 2)
+        const arrowScale = fieldArrowOpts.scale
+        if (plane === 'XY') {
+            for (let i = 0; i < Nx; i += stride) {
+                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Ny; j += stride) {
+                    fieldArrows.push({
+                        x: i,
+                        y: j,
+                        dx: volumeData[0][i][j][focusPosition[2]] * arrowScale,
+                        dy: volumeData[1][i][j][focusPosition[2]] * arrowScale
+                    })
+                }
+            }
+        }
+        else if (plane === 'XZ') {
+            for (let i = 0; i < Nx; i += stride) {
+                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
+                    fieldArrows.push({
+                        x: i,
+                        y: j,
+                        dx: volumeData[0][i][focusPosition[1]][j] * arrowScale,
+                        dy: volumeData[2][i][focusPosition[1]][j] * arrowScale
+                    })
+                }
+            }
+        }
+        else if (plane === 'YZ') {
+            for (let i = 0; i < Ny; i += stride) {
+                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
+                    fieldArrows.push({
+                        x: i,
+                        y: j,
+                        dx: volumeData[1][focusPosition[0]][i][j] * arrowScale,
+                        dy: volumeData[2][focusPosition[0]][i][j] * arrowScale
+                    })
+                }
+            }
+        }
+        return fieldArrows
+    }, [plane, Nx, Ny, Nz, focusPosition, volumeData, fieldArrowOpts])
     const outerParentDivStyle: React.CSSProperties = useMemo(() => ({
         position: 'absolute',
         width,
@@ -179,6 +237,17 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
                     height={innerHeight}
                     plane={plane}
                 />
+                {
+                    fieldArrowOpts && (
+                        <PlaneFieldArrowsView
+                            width={innerWidth}
+                            height={innerHeight}
+                            scale={scale}
+                            focus={focus12}
+                            fieldArrows={fieldArrows}
+                        />
+                    )
+                }
             </div>
         </div>
     )

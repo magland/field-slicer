@@ -49,6 +49,7 @@ const VolumeWidget: FunctionComponent<Props> = ({volumeData, componentNames, wid
                 setScale={setScale}
                 width={0} // filled in by splitter
                 height={0} // filled in by splitter
+                showFieldArrows={false}
             />
         </Splitter>
     )

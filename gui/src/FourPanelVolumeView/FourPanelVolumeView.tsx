@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useMemo } from 'react';
-import PlaneView from './PlaneView/PlaneView';
+import React, { FunctionComponent, useMemo, useState } from 'react';
+import PlaneView, { FieldArrowOpts } from './PlaneView/PlaneView';
 import Volume3DScene from './Volume3DScene';
 
 type Props = {
@@ -13,11 +13,12 @@ type Props = {
     setScale: (s: number) => void
     width: number
     height: number
+    showFieldArrows: boolean
 }
 
 export type Coord3 = [number, number, number]
 
-const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNames, width, height, focusPosition, setFocusPosition, componentIndex, setComponentIndex, scale, setScale}) => {
+const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNames, width, height, focusPosition, setFocusPosition, componentIndex, setComponentIndex, scale, setScale, showFieldArrows}) => {
     const W = width / 2
     const H = height / 2
     const style0: React.CSSProperties = useMemo(() => ({
@@ -56,6 +57,9 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
         return {vMin, vMax}
     }, [volumeData, Nc, Nx, Ny, Nz])
     const valueRange: [number, number] = useMemo(() => ([vMin, vMax]), [vMin, vMax])
+
+    const [fieldArrowOpts, setFieldArrowOpts] = useState<FieldArrowOpts>({stride: 4, scale: 3})
+
     return (
         <div style={style0}>
             <div style={style1}>
@@ -83,6 +87,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
                     width={W}
                     height={H}
                     scale={scale}
+                    fieldArrowOpts={showFieldArrows ? fieldArrowOpts : undefined}
                 />
             </div>
             <div style={style3}>
@@ -96,6 +101,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
                     width={W}
                     height={H}
                     scale={scale}
+                    fieldArrowOpts={showFieldArrows ? fieldArrowOpts : undefined}
                 />
             </div>
             <div style={style4}>
@@ -109,6 +115,7 @@ const FourPanelVolumeView: FunctionComponent<Props> = ({volumeData, componentNam
                     width={W}
                     height={H}
                     scale={scale}
+                    fieldArrowOpts={showFieldArrows ? fieldArrowOpts : undefined}
                 />
             </div>
         </div>

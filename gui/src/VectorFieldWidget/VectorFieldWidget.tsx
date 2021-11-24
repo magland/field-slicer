@@ -68,6 +68,7 @@ const VectorFieldWidget: FunctionComponent<Props> = ({volumeData, width, height}
                 setScale={setScale}
                 width={0} // filled in by splitter
                 height={0} // filled in by splitter
+                showFieldArrows={true}
             />
         </Splitter>
     )
