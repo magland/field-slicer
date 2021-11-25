@@ -28,6 +28,8 @@ const LeftPanel: FunctionComponent<Props> = ({volumeData, componentNames, width,
             setScale={setScale}
             width={width}
             height={height}
+            fieldArrowOpts={undefined}
+            setFieldArrowOpts={undefined}
         />
     )
 }

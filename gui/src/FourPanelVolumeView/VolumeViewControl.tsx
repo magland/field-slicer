@@ -2,7 +2,11 @@ import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import Hyperlink from 'components/Hyperlink/Hyperlink';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import ComponentSelect from './ComponentSelect';
+import FieldArrowsScaleControl from './FieldArrowsScaleControl';
+import FieldArrowsShowControl from './FieldArrowsShowControl';
+import FieldArrowsStrideControl from './FieldArrowsStrideControl';
 import { Coord3 } from './FourPanelVolumeView';
+import { FieldArrowOpts } from './PlaneView/PlaneView';
 import "./VolumeViewControl.css"
 
 type Props = {
@@ -16,9 +20,11 @@ type Props = {
     setScale: (s: number) => void
     width: number
     height: number
+    fieldArrowOpts?: FieldArrowOpts
+    setFieldArrowOpts?: (o: FieldArrowOpts) => void
 }
 
-const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, scale, setScale, width, height}) => {
+const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames, componentIndex, setComponentIndex, focusPosition, setFocusPosition, scale, setScale, width, height, fieldArrowOpts, setFieldArrowOpts}) => {
     const {Nc, Nx, Ny, Nz} = useMemo(() => {
         return {Nc: volumeData.length, Nx: volumeData[0].length, Ny: volumeData[0][0].length, Nz: volumeData[0][0][0].length}
     }, [volumeData])
@@ -76,6 +82,16 @@ const VolumeViewControl: FunctionComponent<Props> = ({volumeData, componentNames
                     </TableRow>
                 </TableBody>
             </Table>
+            {
+                fieldArrowOpts && setFieldArrowOpts && (
+                    <div>
+                        <h3>Field arrows</h3>
+                        <FieldArrowsShowControl fieldArrowOpts={fieldArrowOpts} setFieldArrowOpts={setFieldArrowOpts} />
+                        <FieldArrowsStrideControl fieldArrowOpts={fieldArrowOpts} setFieldArrowOpts={setFieldArrowOpts} />
+                        <FieldArrowsScaleControl fieldArrowOpts={fieldArrowOpts} setFieldArrowOpts={setFieldArrowOpts} />
+                    </div>
+                )
+            }
         </div>
     )
 }

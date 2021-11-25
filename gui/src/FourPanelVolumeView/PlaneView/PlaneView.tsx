@@ -7,6 +7,7 @@ import PlaneFrameView from './PlaneFrameView';
 export type Plane = 'XY' | 'XZ' | 'YZ'
 
 export type FieldArrowOpts = {
+    show: boolean
     stride: number
     scale: number
 }
@@ -110,6 +111,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
     const fieldArrows: FieldArrow[] = useMemo(() => {
         const fieldArrows: FieldArrow[] = []
         if (!fieldArrowOpts) return fieldArrows
+        if (!fieldArrowOpts.show) return fieldArrows
         const stride = fieldArrowOpts.stride
         const stride2 = Math.floor(stride / 2)
         const arrowScale = fieldArrowOpts.scale
@@ -238,7 +240,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
                     plane={plane}
                 />
                 {
-                    fieldArrowOpts && (
+                    fieldArrowOpts && fieldArrowOpts.show && (
                         <PlaneFieldArrowsView
                             width={innerWidth}
                             height={innerHeight}

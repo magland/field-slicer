@@ -1,6 +1,6 @@
 import Splitter from 'components/Splitter/Splitter';
 import FourPanelVolumeView, { Coord3 } from 'FourPanelVolumeView/FourPanelVolumeView';
-import { allocateZeros4d } from 'FourPanelVolumeView/PlaneView/PlaneView';
+import { allocateZeros4d, FieldArrowOpts } from 'FourPanelVolumeView/PlaneView/PlaneView';
 import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import LeftPanel from './LeftPanel';
 
@@ -39,6 +39,8 @@ const VectorFieldWidget: FunctionComponent<Props> = ({volumeData, width, height}
     }, [volumeData, Nx, Ny, Nz])
     const componentNames = useMemo(() => (['x', 'y', 'z', 'norm']), [])
 
+    const [fieldArrowOpts, setFieldArrowOpts] = useState<FieldArrowOpts>({stride: 4, scale: 3, show: true})
+
     return (
         <Splitter
             width={width}
@@ -56,6 +58,8 @@ const VectorFieldWidget: FunctionComponent<Props> = ({volumeData, width, height}
                 setScale={setScale}
                 width={0} // filled in by splitter
                 height={0} // filled in by splitter
+                fieldArrowOpts={fieldArrowOpts}
+                setFieldArrowOpts={setFieldArrowOpts}
             />
             <FourPanelVolumeView
                 volumeData={volumeData2}
@@ -68,7 +72,7 @@ const VectorFieldWidget: FunctionComponent<Props> = ({volumeData, width, height}
                 setScale={setScale}
                 width={0} // filled in by splitter
                 height={0} // filled in by splitter
-                showFieldArrows={true}
+                fieldArrowOpts={fieldArrowOpts}
             />
         </Splitter>
     )

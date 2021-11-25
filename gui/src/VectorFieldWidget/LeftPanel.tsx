@@ -1,4 +1,5 @@
 import { Coord3 } from 'FourPanelVolumeView/FourPanelVolumeView';
+import { FieldArrowOpts } from 'FourPanelVolumeView/PlaneView/PlaneView';
 import VolumeViewControl from 'FourPanelVolumeView/VolumeViewControl';
 import React, { FunctionComponent } from 'react';
 
@@ -13,9 +14,11 @@ type Props = {
     setScale: (s: number) => void
     width: number
     height: number
+    fieldArrowOpts?: FieldArrowOpts
+    setFieldArrowOpts: (o: FieldArrowOpts) => void
 }
 
-const LeftPanel: FunctionComponent<Props> = ({volumeData, componentNames, width, height, focusPosition, setFocusPosition, componentIndex, setComponentIndex, scale, setScale}) => {
+const LeftPanel: FunctionComponent<Props> = ({volumeData, componentNames, width, height, focusPosition, setFocusPosition, componentIndex, setComponentIndex, scale, setScale, fieldArrowOpts, setFieldArrowOpts}) => {
     return (
         <VolumeViewControl
             volumeData={volumeData}
@@ -28,6 +31,8 @@ const LeftPanel: FunctionComponent<Props> = ({volumeData, componentNames, width,
             setScale={setScale}
             width={width}
             height={height}
+            fieldArrowOpts={fieldArrowOpts}
+            setFieldArrowOpts={setFieldArrowOpts}
         />
     )
 }
