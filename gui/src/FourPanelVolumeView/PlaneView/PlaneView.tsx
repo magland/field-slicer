@@ -46,23 +46,21 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
     const innerWidth = width - margin * 2
     const innerHeight = height - margin * 2
 
-    const delayedFocusPosition = focusPosition
-
     const {N1, N2, planeData, focus12, setFocus12} = useMemo(() => {
         const c = componentIndex
         if (plane === 'XY') {
             const N1 = Nx
             const N2 = Ny
             const N3 = Nz
-            const focus12: [number, number] = [delayedFocusPosition[0], delayedFocusPosition[1]]
+            const focus12: [number, number] = [focusPosition[0], focusPosition[1]]
             const setFocus12 = (x: [number, number]) => {
-                setFocusPosition([x[0], x[1], delayedFocusPosition[2]])
+                setFocusPosition([x[0], x[1], focusPosition[2]])
             }
             const planeData = allocateZeros2d(N1, N2)
-            if ((0 <= delayedFocusPosition[2]) && (delayedFocusPosition[2] < N3)) {
+            if ((0 <= focusPosition[2]) && (focusPosition[2] < N3)) {
                 for (let i1 = 0; i1 < N1; i1++) {
                     for (let i2 = 0; i2 < N2; i2++) {
-                        planeData[i1][i2] = volumeData[c][i1][i2][delayedFocusPosition[2]]
+                        planeData[i1][i2] = volumeData[c][i1][i2][focusPosition[2]]
                     }
                 }
             }
@@ -72,15 +70,15 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
             const N1 = Nx
             const N2 = Nz
             const N3 = Ny
-            const focus12: [number, number] = [delayedFocusPosition[0], delayedFocusPosition[2]]
+            const focus12: [number, number] = [focusPosition[0], focusPosition[2]]
             const setFocus12 = (x: [number, number]) => {
-                setFocusPosition([x[0], delayedFocusPosition[1], x[1]])
+                setFocusPosition([x[0], focusPosition[1], x[1]])
             }
             const planeData = allocateZeros2d(N1, N2)
-            if ((0 <= delayedFocusPosition[1]) && (delayedFocusPosition[1] < N3)) {
+            if ((0 <= focusPosition[1]) && (focusPosition[1] < N3)) {
                 for (let i1 = 0; i1 < N1; i1++) {
                     for (let i2 = 0; i2 < N2; i2++) {
-                        planeData[i1][i2] = volumeData[c][i1][delayedFocusPosition[1]][i2]
+                        planeData[i1][i2] = volumeData[c][i1][focusPosition[1]][i2]
                     }
                 }
             }
@@ -90,15 +88,15 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
             const N1 = Ny
             const N2 = Nz
             const N3 = Nx
-            const focus12: [number, number] = [delayedFocusPosition[1], delayedFocusPosition[2]]
+            const focus12: [number, number] = [focusPosition[1], focusPosition[2]]
             const setFocus12 = (x: [number, number]) => {
-                setFocusPosition([delayedFocusPosition[0], x[0], x[1]])
+                setFocusPosition([focusPosition[0], x[0], x[1]])
             }
             const planeData = allocateZeros2d(N1, N2)
-            if ((0 <= delayedFocusPosition[0]) && (delayedFocusPosition[0] < N3)) {
+            if ((0 <= focusPosition[0]) && (focusPosition[0] < N3)) {
                 for (let i1 = 0; i1 < N1; i1++) {
                     for (let i2 = 0; i2 < N2; i2++) {
-                        planeData[i1][i2] = volumeData[c][delayedFocusPosition[0]][i1][i2]
+                        planeData[i1][i2] = volumeData[c][focusPosition[0]][i1][i2]
                     }
                 }
             }
@@ -107,7 +105,7 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
         else {
             throw Error('Unexpected')
         }
-    }, [volumeData, componentIndex, plane, delayedFocusPosition, setFocusPosition, Nx, Ny, Nz])
+    }, [volumeData, componentIndex, plane, focusPosition, setFocusPosition, Nx, Ny, Nz])
     const fieldArrows: FieldArrow[] = useMemo(() => {
         const fieldArrows: FieldArrow[] = []
         if (!fieldArrowOpts) return fieldArrows
@@ -116,38 +114,44 @@ const PlaneView: FunctionComponent<Props> = ({volumeData, componentIndex, plane,
         const stride2 = Math.floor(stride / 2)
         const arrowScale = fieldArrowOpts.scale
         if (plane === 'XY') {
-            for (let i = 0; i < Nx; i += stride) {
-                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Ny; j += stride) {
-                    fieldArrows.push({
-                        x: i,
-                        y: j,
-                        dx: volumeData[0][i][j][focusPosition[2]] * arrowScale,
-                        dy: volumeData[1][i][j][focusPosition[2]] * arrowScale
-                    })
+            if ((0 <= focusPosition[2]) && (focusPosition[2] < Nz)) {
+                for (let i = 0; i < Nx; i += stride) {
+                    for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Ny; j += stride) {
+                        fieldArrows.push({
+                            x: i,
+                            y: j,
+                            dx: volumeData[0][i][j][focusPosition[2]] * arrowScale,
+                            dy: volumeData[1][i][j][focusPosition[2]] * arrowScale
+                        })
+                    }
                 }
             }
         }
         else if (plane === 'XZ') {
-            for (let i = 0; i < Nx; i += stride) {
-                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
-                    fieldArrows.push({
-                        x: i,
-                        y: j,
-                        dx: volumeData[0][i][focusPosition[1]][j] * arrowScale,
-                        dy: volumeData[2][i][focusPosition[1]][j] * arrowScale
-                    })
+            if ((0 <= focusPosition[1]) && (focusPosition[1] < Ny)) {
+                for (let i = 0; i < Nx; i += stride) {
+                    for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
+                        fieldArrows.push({
+                            x: i,
+                            y: j,
+                            dx: volumeData[0][i][focusPosition[1]][j] * arrowScale,
+                            dy: volumeData[2][i][focusPosition[1]][j] * arrowScale
+                        })
+                    }
                 }
             }
         }
         else if (plane === 'YZ') {
-            for (let i = 0; i < Ny; i += stride) {
-                for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
-                    fieldArrows.push({
-                        x: i,
-                        y: j,
-                        dx: volumeData[1][focusPosition[0]][i][j] * arrowScale,
-                        dy: volumeData[2][focusPosition[0]][i][j] * arrowScale
-                    })
+            if ((0 <= focusPosition[0]) && (focusPosition[0] < Nx)) {
+                for (let i = 0; i < Ny; i += stride) {
+                    for (let j = (i/stride % 2) === 0 ? 0 : stride2; j < Nz; j += stride) {
+                        fieldArrows.push({
+                            x: i,
+                            y: j,
+                            dx: volumeData[1][focusPosition[0]][i][j] * arrowScale,
+                            dy: volumeData[2][focusPosition[0]][i][j] * arrowScale
+                        })
+                    }
                 }
             }
         }

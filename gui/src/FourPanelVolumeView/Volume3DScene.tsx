@@ -79,9 +79,9 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
     }, [])
 
     const objects = useMemo(() => {
-        const planeXY = planeMesh([0, 0, focusPosition[2]], [Nx, 0, 0], [0, Ny, 0], [0, 0, 1], 'rgb(150, 120, 120)')
+        const planeXY = planeMesh([0, 0, focusPosition[2]], [Nx, 0, 0], [0, Ny, 0], [0, 0, 1], 'rgb(120, 120, 150)')
         const planeXZ = planeMesh([0, focusPosition[1], 0], [Nx, 0, 0], [0, 0, Nz], [0, 1, 0], 'rgb(120, 150, 120)')
-        const planeYZ = planeMesh([focusPosition[0], 0, 0], [0, Ny, 0], [0, 0, Nz], [1, 0, 0], 'rgb(120, 120, 150)')
+        const planeYZ = planeMesh([focusPosition[0], 0, 0], [0, Ny, 0], [0, 0, Nz], [1, 0, 0], 'rgb(150, 120, 120)')
         const lineX = lineMesh(focusPosition, [Nx * 1.3, focusPosition[1], focusPosition[2]], 'red')
         const lineY = lineMesh(focusPosition, [focusPosition[0], Ny * 1.3, focusPosition[2]], 'green')
         const lineZ = lineMesh(focusPosition, [focusPosition[0], focusPosition[1], Nz * 1.3], 'blue')
