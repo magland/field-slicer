@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
+import { DoubleSide } from 'three';
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Coord3 } from './FourPanelVolumeView';
 import "./VolumeViewControl.css";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { DoubleSide } from 'three';
 
 type Props = {
     volumeData: number[][][][]
@@ -105,6 +105,12 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
         }
     }, [width, height, bbox, container])
 
+    const renderer = useMemo(() => {
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( width, height );
+        return renderer
+    }, [width, height])
+
     useEffect(() => {
         if (!scene) return
         if (!container) return
@@ -112,9 +118,6 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
         if (!camera) return
 
         scene.clear()
-
-        var renderer = new THREE.WebGLRenderer();
-        renderer.setSize( width, height );
 
         while (container.firstChild) container.removeChild(container.firstChild)
         container.appendChild(renderer.domElement)
@@ -152,7 +155,7 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
         return () => {
             controls.removeEventListener('change', render)
         }
-    }, [camera, container, controls, height, objects, width, scene])
+    }, [renderer, camera, container, controls, height, objects, width, scene])
 
     return (
         <div ref={setContainer} />
