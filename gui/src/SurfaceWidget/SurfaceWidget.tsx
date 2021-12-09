@@ -1,17 +1,15 @@
 import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
-import { DoubleSide } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 type Props = {
     vertices: number[][]
-    faces: number[]
-    ifaces: number[]
+    faces: number[][]
     width: number
     height: number
 }
 
-const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces, ifaces}) => {
+const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces}) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
     const scene = useMemo(() => {
         const scene = new THREE.Scene()
@@ -32,7 +30,7 @@ const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces
         if (!container) return {camera: undefined, controls: undefined}
         const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
         const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
-        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 6)
+        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
         const controls = new OrbitControls( camera, container )
         controls.target.set(p.x, p.y, p.z)
         return {
@@ -46,24 +44,28 @@ const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces
         return renderer
     }, [width, height])
     const objects = useMemo(() => {
-        const material = new THREE.MeshPhongMaterial( {
+        // const material = new THREE.MeshPhongMaterial( {
+        //     color: 'green',
+        //     flatShading: true,
+        //     side: DoubleSide
+        // })
+        const material = new THREE.MeshBasicMaterial( {
             color: 'green',
-            flatShading: true,
-            side: DoubleSide
+            wireframe: true
         })
     
         const geometry = new THREE.BufferGeometry()
     
-        const indices0: number[] = []
+        const indices0: number[] = [] // faces
         const vertices0 = []
         const normals0 = []
     
         for (let v of vertices) {
             vertices0.push(v[0], v[1], v[2])
-            normals0.push(1, 0, 0)
+            normals0.push(1, 0, 0) // don't know how to do this right now, so passing (1, 0, 0)
         }
-        for (let iface of ifaces) {
-            indices0.push(faces[iface], faces[iface + 1], faces[iface + 2])
+        for (let f of faces) {
+            indices0.push(f[0], f[1], f[2])
         }
         
         geometry.setIndex( indices0 );
@@ -71,7 +73,7 @@ const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces
         geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals0, 3 ) )
         const obj = new THREE.Mesh( geometry, material )
         return [obj]
-    }, [vertices, faces, ifaces])
+    }, [vertices, faces])
     useEffect(() => {
         if (!scene) return
         if (!container) return
@@ -106,7 +108,7 @@ const SurfaceWidget: FunctionComponent<Props> = ({width, height, vertices, faces
         return () => {
             controls.removeEventListener('change', render)
         }
-    }, [renderer, camera, container, controls, scene])
+    }, [renderer, camera, container, controls, scene, objects])
     return (
         <div ref={setContainer} />
     )

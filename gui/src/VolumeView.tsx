@@ -35,7 +35,6 @@ const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
             <SurfaceWidget
                 vertices={data.vertices}
                 faces={data.faces}
-                ifaces={data.ifaces}
                 width={width}
                 height={height}
             />

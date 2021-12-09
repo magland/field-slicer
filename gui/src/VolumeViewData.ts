@@ -16,8 +16,7 @@ type VolumeViewData = {
     numVertices: number
     numFaces: number
     vertices: number[][]
-    faces: number[]
-    ifaces: number[]
+    faces: number[][]
 }
 
 export const isVolumeViewData = (x: any): x is VolumeViewData => {
@@ -42,8 +41,7 @@ export const isVolumeViewData = (x: any): x is VolumeViewData => {
             numVertices: isNumber,
             numFaces: isNumber,
             vertices: () => (true),
-            faces: () => (true),
-            ifaces: () => (true)
+            faces: () => (true)
         }, {allowAdditionalFields: true})
     }
     return isOneOf([isVolumeData, isVectorFieldData, isSurfaceData])(x)
