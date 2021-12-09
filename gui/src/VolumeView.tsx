@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import SurfaceWidget from 'SurfaceWidget/SurfaceWidget';
 import VectorFieldWidgetWrapper from 'VectorFieldWidget/VectorFieldWidgetWrapper';
 import VolumeViewData from 'VolumeViewData';
 import VolumeWidgetWrapper from 'VolumeWidget/VolumeWidgetWrapper';
@@ -24,6 +25,17 @@ const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
         return (
             <VectorFieldWidgetWrapper
                 dataUri={data.dataUri}
+                width={width}
+                height={height}
+            />
+        )
+    }
+    else if (data.type === 'surface') {
+        return (
+            <SurfaceWidget
+                vertices={data.vertices}
+                faces={data.faces}
+                ifaces={data.ifaces}
                 width={width}
                 height={height}
             />

@@ -8,9 +8,16 @@ type VolumeViewData = {
     dataShape: number[]
     componentNames: string[]
 } | {
-    type: 'vector_field',
-    dataUri: string,
+    type: 'vector_field'
+    dataUri: string
     dataShap1: number[]
+} | {
+    type: 'surface'
+    numVertices: number
+    numFaces: number
+    vertices: number[][]
+    faces: number[]
+    ifaces: number[]
 }
 
 export const isVolumeViewData = (x: any): x is VolumeViewData => {
@@ -29,7 +36,17 @@ export const isVolumeViewData = (x: any): x is VolumeViewData => {
             dataShape: isArrayOf(isNumber)
         }, {allowAdditionalFields: true})
     }
-    return isOneOf([isVolumeData, isVectorFieldData])(x)
+    const isSurfaceData = (x: any) => {
+        return validateObject(x, {
+            type: isEqualTo('surface'),
+            numVertices: isNumber,
+            numFaces: isNumber,
+            vertices: () => (true),
+            faces: () => (true),
+            ifaces: () => (true)
+        }, {allowAdditionalFields: true})
+    }
+    return isOneOf([isVolumeData, isVectorFieldData, isSurfaceData])(x)
 }
 
 export default VolumeViewData
