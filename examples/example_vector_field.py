@@ -1,3 +1,6 @@
+# On 12/10/21 produced output:
+# https://figurl.org/f?v=gs://figurl/volumeview-2&d=48530916122545e6afeaf84645e7e13ea4651791&channel=flatiron1&label=Test%20vector%20field%20view
+
 import os
 import numpy as np
 import volumeview as vv

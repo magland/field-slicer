@@ -24,9 +24,7 @@ def create_surface_view(*,
     F = fig.Figure(view_url='gs://figurl/volumeview-2', data=data)
     return F
 
-def _create_surface_view_from_vtk_unstructured_grid(vtk_uri: str):
-    vtk_path = kc.load_file(vtk_uri)
-    if vtk_path is None: raise Exception(f'Unable to load file: {vtk_uri}')
+def _parse_vtk_unstructured_grid(vtk_path: str):
     x = vtk_to_mesh_dict(vtk_path, format='UnstructuredGrid')
     vertices = np.array(x['vertices'], dtype=np.float32).T
     faces = np.array(x['faces'], dtype=np.int32)
@@ -39,7 +37,7 @@ def _create_surface_view_from_vtk_unstructured_grid(vtk_uri: str):
     
     faces = np.reshape(faces, (math.floor(len(faces) / 3), 3))
 
-    return create_surface_view(vertices=vertices, faces=faces)
+    return vertices, faces
     
 def vtk_to_mesh_dict(vtk_path: str, format: str) -> dict:
     import numpy as np
