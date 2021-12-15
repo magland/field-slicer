@@ -1,4 +1,5 @@
 from typing import List
+import os
 import numpy as np
 import kachery_client as kc
 import figurl as fig
@@ -51,8 +52,9 @@ class Workspace:
         FIGURL_CHANNEL = os.getenv('FIGURL_CHANNEL')
         assert FIGURL_CHANNEL, 'Environment variable not set: FIGURL_CHANNEL'
         data = {
+            'type': 'workspace',
             'grids': [],
-            'sufaces': [],
+            'surfaces': [],
             'gridVectorFields': [],
             'gridScalarFields': [],
             'gridRegions': [],
@@ -86,7 +88,7 @@ class Workspace:
                 'faces': faces_uri
             })
         for X in self._grid_vector_fields:
-            assert X._data in [np.float32]
+            assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['gridVectorFields'].append({
@@ -95,7 +97,7 @@ class Workspace:
                 'data': X._data
             })
         for X in self._grid_scalar_fields:
-            assert X._data in [np.float32]
+            assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['gridScalarFields'].append({
@@ -104,7 +106,7 @@ class Workspace:
                 'data': X._data
             })
         for X in self._grid_regions:
-            assert X._data in [np.uint8]
+            assert X._data.dtype in [np.uint8]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['gridRegions'].append({
@@ -113,7 +115,7 @@ class Workspace:
                 'data': X._data
             })
         for X in self._surface_vector_fields:
-            assert X._data in [np.float32]
+            assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['surfaceVectorFields'].append({
@@ -122,7 +124,7 @@ class Workspace:
                 'data': X._data
             })
         for X in self._surface_scalar_fields:
-            assert X._data in [np.float32]
+            assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['surfaceScalarFields'].append({
@@ -131,7 +133,7 @@ class Workspace:
                 'data': X._data
             })
         for X in self._surface_regions:
-            assert X._data in [np.uint8]
+            assert X._data.dtype in [np.uint8]
             data_uri = kc.store_json(_serialize(X._data))
             kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
             data['surfaceRegions'].append({

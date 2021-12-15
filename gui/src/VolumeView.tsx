@@ -3,6 +3,7 @@ import SurfaceWidget from 'SurfaceWidget/SurfaceWidget';
 import VectorFieldWidgetWrapper from 'VectorFieldWidget/VectorFieldWidgetWrapper';
 import VolumeViewData from 'VolumeViewData';
 import VolumeWidgetWrapper from 'VolumeWidget/VolumeWidgetWrapper';
+import WorkspaceView from 'WorkspaceView/WorkspaceView';
 
 type Props = {
     data: VolumeViewData
@@ -35,6 +36,15 @@ const VolumeView: FunctionComponent<Props> = ({data, width, height}) => {
             <SurfaceWidget
                 vertices={data.vertices}
                 faces={data.faces}
+                width={width}
+                height={height}
+            />
+        )
+    }
+    else if (data.type === 'workspace') {
+        return (
+            <WorkspaceView
+                data={data}
                 width={width}
                 height={height}
             />
