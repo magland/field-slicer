@@ -24,8 +24,8 @@ const paint = (context: CanvasRenderingContext2D, props: Props) => {
     for (let fa of fieldArrows) {
         const x = width / 2 + (fa.x - focus[0]) * scale1
         const y = height / 2 - (fa.y - focus[1]) * scale2
-        const dx = fa.dx * scale1
-        const dy = - fa.dy * scale2
+        const dx = fa.dx
+        const dy = - fa.dy
         const a = -dy
         const b = dx
         context.moveTo(x, y)

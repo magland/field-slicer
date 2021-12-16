@@ -2,7 +2,7 @@ import FourPanelView, { Vec3 } from 'FourPanelView/FourPanelView';
 import { allocateZeros3d } from 'FourPanelView/PlanePanelView/PlanePanelView';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
-import { VectorFieldComponentName, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
+import { PanelLayoutMode, VectorFieldComponentName, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
 
 type Props = {
     data: WorkspaceViewData
@@ -121,6 +121,20 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
         data.surfaces.filter(s => ((selection.visibleSurfaceNames || []).includes(s.name)))
     ), [data.surfaces, selection.visibleSurfaceNames])
 
+    const handleSetPanelLayoutMode = useCallback((panelLayoutMode: PanelLayoutMode) => {
+        selectionDispatch({
+            type: 'setPanelLayoutMode',
+            panelLayoutMode
+        })
+    }, [selectionDispatch])
+
+    const handleZoom = useCallback((direction: number) => {
+        selectionDispatch({
+            type: 'planeViewZoom',
+            direction
+        })
+    }, [selectionDispatch])
+
     return (
         <FourPanelView
             width={width}
@@ -134,6 +148,10 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
             focusPosition={selection.focusPosition}
             setFocusPosition={setFocusPosition}
             referencePlaneOpts={selection.referencePlaneOpts}
+            planeViewOpts={selection.planeViewOpts}
+            panelLayoutMode={selection.panelLayoutMode}
+            setPanelLayoutMode={handleSetPanelLayoutMode}
+            onZoom={handleZoom}
         />
     )
 }

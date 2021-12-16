@@ -1,6 +1,7 @@
 import { Vec3 } from 'FourPanelView/FourPanelView';
 import React, { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import { WorkspaceGrid } from 'VolumeViewData';
+import { PlaneViewOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 import PlanePanelDataView from './PlanePanelDataView';
 import PlanePanelFieldArrowsView from './PlanePanelFieldArrowsView';
 import PlanePanelFrameView from './PlanePanelFrameView';
@@ -31,6 +32,8 @@ type Props = {
     arrowDataMax: number
     focusPosition: Vec3
     setFocusPosition: (p: Vec3) => void
+    planeViewOpts: PlaneViewOpts
+    onZoom: (direction: number) => void
 }
 
 type DragState = {
@@ -42,17 +45,18 @@ type DragState = {
 const fieldArrowOpts: FieldArrowOpts = {
     show: true,
     stride: 5,
-    scale: 6
+    scale: 20
 }
 
-const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, scalarData, scalarDataRange, arrowData, arrowDataMax, focusPosition, setFocusPosition}) => {
+const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, scalarData, scalarDataRange, arrowData, arrowDataMax, focusPosition, setFocusPosition, planeViewOpts, onZoom}) => {
+    const zoomFactor = planeViewOpts.zoomFactor
     const {N1, N2, planeData, focus12, setFocus12, scale1, scale2} = useMemo(() => {
         if (plane === 'XY') {
             const N1 = grid.Nx
             const N2 = grid.Ny
             const N3 = grid.Nz
-            const scale1 = grid.dx
-            const scale2 = grid.dy
+            const scale1 = grid.dx * zoomFactor
+            const scale2 = grid.dy * zoomFactor
             const focus12: [number, number] = [focusPosition[0], focusPosition[1]]
             const setFocus12 = (x: [number, number]) => {
                 setFocusPosition([x[0], x[1], focusPosition[2]])
@@ -71,8 +75,8 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
             const N1 = grid.Nx
             const N2 = grid.Nz
             const N3 = grid.Ny
-            const scale1 = grid.dx
-            const scale2 = grid.dz
+            const scale1 = grid.dx * zoomFactor
+            const scale2 = grid.dz * zoomFactor
             const focus12: [number, number] = [focusPosition[0], focusPosition[2]]
             const setFocus12 = (x: [number, number]) => {
                 setFocusPosition([x[0], focusPosition[1], x[1]])
@@ -91,8 +95,8 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
             const N1 = grid.Ny
             const N2 = grid.Nz
             const N3 = grid.Nx
-            const scale1 = grid.dy
-            const scale2 = grid.dz
+            const scale1 = grid.dy * zoomFactor
+            const scale2 = grid.dz * zoomFactor
             const focus12: [number, number] = [focusPosition[1], focusPosition[2]]
             const setFocus12 = (x: [number, number]) => {
                 setFocusPosition([focusPosition[0], x[0], x[1]])
@@ -110,7 +114,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
         else {
             throw Error('Unexpected')
         }
-    }, [scalarData, plane, focusPosition, setFocusPosition, grid])
+    }, [scalarData, plane, focusPosition, setFocusPosition, grid, zoomFactor])
 
     const fieldArrows: FieldArrow[] | undefined = useMemo(() => {
         if (!arrowData) return undefined
@@ -119,7 +123,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
         if (!fieldArrowOpts.show) return fieldArrows
         const stride = fieldArrowOpts.stride
         const stride2 = Math.floor(stride / 2)
-        const arrowScale = fieldArrowOpts.scale / arrowDataMax
+        const arrowScale = fieldArrowOpts.scale / arrowDataMax * zoomFactor
         if (plane === 'XY') {
             if ((0 <= focusPosition[2]) && (focusPosition[2] < grid.Nz)) {
                 for (let i = 0; i < grid.Nx; i += stride) {
@@ -163,7 +167,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
             }
         }
         return fieldArrows
-    }, [plane, grid, focusPosition, arrowData, arrowDataMax])
+    }, [plane, grid, focusPosition, arrowData, arrowDataMax, zoomFactor])
     
     const margin = 8
     const innerWidth = width - margin * 2
@@ -227,6 +231,10 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
         setFocus12(p12)
     }, [focus12, setFocus12, innerWidth, innerHeight, N2, scale1, scale2])
 
+    const handleWheel: React.WheelEventHandler<HTMLDivElement> = useCallback((evt) => {
+        onZoom(evt.deltaY > 0 ? -1 : 1)
+    }, [onZoom])
+
     return (
         <div
             style={outerParentDivStyle}
@@ -238,6 +246,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
                 onMouseLeave={handleMouseLeave}
                 onMouseMove={handleMouseMove}
                 onDoubleClick={handleDoubleClick}
+                onWheel={handleWheel}
             >
                 
                 <div style={childDivStyle}>

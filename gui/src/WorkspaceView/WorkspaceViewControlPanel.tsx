@@ -2,6 +2,7 @@ import { Checkbox, MenuItem, Radio, Select } from '@material-ui/core';
 import { JSONStringifyDeterministic } from 'figurl/viewInterface/kacheryTypes';
 import React, { FunctionComponent, useCallback } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
+import ZoomFactorControl from './controls/ZoomFactorControl';
 import { GridScalarValue, VectorFieldComponentName, vectorFieldComponentNames, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
 
 type Props = {
@@ -66,6 +67,12 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
             type: 'toggleTransparentReferencePlanes'
         })
     }, [selectionDispatch])
+    const handlePlaneViewZoom = useCallback((direction: number) => {
+        selectionDispatch({
+            type: 'planeViewZoom',
+            direction
+        })
+    }, [selectionDispatch])
     return (
         <div style={{padding: 10, overflowY: "auto"}}>
 
@@ -91,7 +98,7 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                 {
                     data.gridVectorFields.filter(x => (x.gridName === selection.gridName)).map(x => (
                         <div key={x.name}>
-                            <div key="grid-vector-field">{x.name} (grid vector field)</div>
+                            <div key="grid-vector-field">{x.name}</div>
                             {
                                 vectorFieldComponentNames.map(a => (
                                     <div key={a}>
@@ -121,7 +128,7 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                 {
                     data.gridScalarFields.filter(x => (x.gridName === selection.gridName)).map(x => (
                         <div key={x.name}>
-                            <div key="grid-scalar-field">{x.name} (grid scalar field)</div>
+                            <div key="grid-scalar-field">{x.name}</div>
                             <div>
                                 <Radio
                                     value={JSON.stringify({gridScalarFieldName: x.name})}
@@ -174,6 +181,15 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                         onChange={handleToggleTransparentReferencePlanes}
                     /> Transparent reference planes
                 </div>
+            </div>
+
+            {/* Plane views */}
+            <div key="plane-views">
+                <h3>Plane views</h3>
+                <ZoomFactorControl
+                    value={selection.planeViewOpts.zoomFactor}
+                    onZoom={handlePlaneViewZoom}
+                />
             </div>
         </div>
     )

@@ -7,8 +7,8 @@ import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
 import { ReferencePlaneOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 
 type Props = {
-    grid: WorkspaceGrid
-    focusPosition: Vec3
+    grid?: WorkspaceGrid
+    focusPosition?: Vec3
     surfaces: WorkspaceSurface[]
     referencePlaneOpts: ReferencePlaneOpts
     width: number
@@ -101,23 +101,27 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
     }, [])
 
     const objects = useMemo(() => {
-        const p0 = [grid.x0, grid.y0, grid.z0]
-        const p1 = [grid.x0 + grid.dx * grid.Nx, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
-        const focusPoint: [number, number, number] = [grid.x0 + focusPosition[0] * grid.dy, grid.y0 + focusPosition[1] * grid.dy, grid.z0 + focusPosition[2] * grid.dz]
-
-        const opts = {opacity: referencePlaneOpts.opacity, transparent: referencePlaneOpts.transparent}
-        const planeXY = planeMesh([p0[0], p0[1], focusPoint[2]], [p1[0] - p0[0], 0, 0], [0, p1[1] - p0[1], 0], [0, 0, 1], 'rgb(120, 120, 150)', opts)
-        const planeXZ = planeMesh([p0[0], focusPoint[1], p0[2]], [p1[0] - p0[0], 0, 0], [0, 0, p1[2] - p0[2]], [0, 1, 0], 'rgb(120, 150, 120)', opts)
-        const planeYZ = planeMesh([focusPoint[0], p0[1], p0[2]], [0, p1[1] - p0[1], 0], [0, 0, p1[2] - p0[2]], [1, 0, 0], 'rgb(150, 120, 120)', opts)
-        const lineX = lineMesh(focusPoint, [grid.x0 + grid.Nx * grid.dx * 1.3, focusPoint[1], focusPoint[2]], 'red')
-        const lineY = lineMesh(focusPoint, [focusPoint[0], grid.y0 + grid.Ny * grid.dy * 1.3, focusPoint[2]], 'green')
-        const lineZ = lineMesh(focusPoint, [focusPoint[0], focusPoint[1], grid.z0 + grid.Nz * grid.dz * 1.3], 'blue')
-
         const objects: THREE.Object3D[] = []
-        if (referencePlaneOpts.show) {
-            objects.push(planeXY, planeXZ, planeYZ)
+
+        if ((grid) && (focusPosition)) {
+            const p0 = [grid.x0, grid.y0, grid.z0]
+            const p1 = [grid.x0 + grid.dx * grid.Nx, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
+            const focusPoint: [number, number, number] = [grid.x0 + focusPosition[0] * grid.dy, grid.y0 + focusPosition[1] * grid.dy, grid.z0 + focusPosition[2] * grid.dz]
+
+            const opts = {opacity: referencePlaneOpts.opacity, transparent: referencePlaneOpts.transparent}
+            const planeXY = planeMesh([p0[0], p0[1], focusPoint[2]], [p1[0] - p0[0], 0, 0], [0, p1[1] - p0[1], 0], [0, 0, 1], 'rgb(120, 120, 150)', opts)
+            const planeXZ = planeMesh([p0[0], focusPoint[1], p0[2]], [p1[0] - p0[0], 0, 0], [0, 0, p1[2] - p0[2]], [0, 1, 0], 'rgb(120, 150, 120)', opts)
+            const planeYZ = planeMesh([focusPoint[0], p0[1], p0[2]], [0, p1[1] - p0[1], 0], [0, 0, p1[2] - p0[2]], [1, 0, 0], 'rgb(150, 120, 120)', opts)
+            const lineX = lineMesh(focusPoint, [grid.x0 + grid.Nx * grid.dx * 1.3, focusPoint[1], focusPoint[2]], 'red')
+            const lineY = lineMesh(focusPoint, [focusPoint[0], grid.y0 + grid.Ny * grid.dy * 1.3, focusPoint[2]], 'green')
+            const lineZ = lineMesh(focusPoint, [focusPoint[0], focusPoint[1], grid.z0 + grid.Nz * grid.dz * 1.3], 'blue')
+
+            
+            if (referencePlaneOpts.show) {
+                objects.push(planeXY, planeXZ, planeYZ)
+            }
+            objects.push(lineX, lineY, lineZ)
         }
-        objects.push(lineX, lineY, lineZ)
 
         for (let X of surfaces) {
             objects.push(
@@ -128,10 +132,15 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
     }, [focusPosition, grid, surfaces, referencePlaneOpts])
 
     const bbox = useMemo(() => {
-        const p0 = [grid.x0, grid.y0, grid.z0]
-        const p1 = [grid.x0 + grid.dx * grid.Ny, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
-        return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]))
-    }, [grid])
+        if (grid) {
+            const p0 = [grid.x0, grid.y0, grid.z0]
+            const p1 = [grid.x0 + grid.dx * grid.Ny, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
+            return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]))
+        }
+        else {
+            return getBoundingBoxForSurfaces(surfaces)
+        }
+    }, [grid, surfaces])
 
     const {camera, controls} = useMemo(() => {
         if (!container) return {camera: undefined, controls: undefined}
@@ -201,6 +210,30 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
     return (
         <div ref={setContainer} />
     )
+}
+
+const getBoundingBoxForSurfaces = (surfaces: WorkspaceSurface[]) => {
+    const mins: [number, number, number][] = []
+    const maxs: [number, number, number][] = []
+    for (let S of surfaces) {
+        mins.push([min(S.vertices.map(v => (v[0]))), min(S.vertices.map(v => (v[1]))), min(S.vertices.map(v => (v[2])))])
+        maxs.push([max(S.vertices.map(v => (v[0]))), max(S.vertices.map(v => (v[1]))), max(S.vertices.map(v => (v[2])))])
+    }
+    if (mins.length === 0) {
+        return new THREE.Box3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1))
+    }
+
+    const vmin = [min(mins.map(a => a[0])), min(mins.map(a => a[1])), min(mins.map(a => a[2]))]
+    const vmax = [max(maxs.map(a => a[0])), max(maxs.map(a => a[1])), max(maxs.map(a => a[2]))]
+    return new THREE.Box3(new THREE.Vector3(vmin[0], vmin[1], vmin[2]), new THREE.Vector3(vmax[0] - vmin[0], vmax[1] - vmin[1], vmax[2] - vmin[2]))
+}
+
+const min = (a: number[]) => {
+    return a.reduce((prev, current) => (prev < current) ? prev : current, a[0] || 0)
+}
+
+const max = (a: number[]) => {
+    return a.reduce((prev, current) => (prev > current) ? prev : current, a[0] || 0)
 }
 
 export default Scene3DPanelView

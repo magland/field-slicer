@@ -17,6 +17,12 @@ export type ReferencePlaneOpts = {
     opacity: number
 }
 
+export type PlaneViewOpts = {
+    zoomFactor: number
+}
+
+export type PanelLayoutMode = '4-panel' | '3d-scene' | 'XY' | 'XZ' | 'YZ'
+
 export type WorkspaceViewSelection = {
     gridName?: string
     gridScalar?: GridScalarValue
@@ -24,6 +30,8 @@ export type WorkspaceViewSelection = {
     focusPosition?: [number, number, number]
     visibleSurfaceNames?: string[]
     referencePlaneOpts: ReferencePlaneOpts
+    planeViewOpts: PlaneViewOpts
+    panelLayoutMode: PanelLayoutMode
 }
 
 export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
@@ -31,7 +39,11 @@ export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
         show: true,
         transparent: true,
         opacity: 0.7
-    }
+    },
+    planeViewOpts: {
+        zoomFactor: 1
+    },
+    panelLayoutMode: '4-panel'
 }
 
 export type WorkspaceViewSelectionAction = {
@@ -59,6 +71,12 @@ export type WorkspaceViewSelectionAction = {
     type: 'toggleShowReferencePlanes'
 } | {
     type: 'toggleTransparentReferencePlanes'
+} | {
+    type: 'planeViewZoom'
+    direction: number
+} | {
+    type: 'setPanelLayoutMode'
+    panelLayoutMode: PanelLayoutMode
 }
 
 export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: WorkspaceViewSelectionAction): WorkspaceViewSelection => {
@@ -89,9 +107,27 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     else if (a.type === 'toggleTransparentReferencePlanes') {
         return {...s, referencePlaneOpts: {...s.referencePlaneOpts, transparent: !s.referencePlaneOpts.transparent}}
     }
+    else if (a.type === 'planeViewZoom') {
+        return {...s, planeViewOpts: {...s.planeViewOpts, zoomFactor: doZoom(s.planeViewOpts.zoomFactor, a.direction)}}
+    }
+    else if (a.type === 'setPanelLayoutMode') {
+        return {...s, panelLayoutMode: a.panelLayoutMode}
+    }
     else {
         throw Error('Unexpected action type')
     }
+}
+
+const doZoom = (zoomFactor: number, direction: number) => {
+    if (direction < 0) {
+        if (zoomFactor > 1) return zoomFactor - 1
+        else return 1 / (Math.round(1 / zoomFactor) + 1)
+    }
+    else if (direction > 0) {
+        if (zoomFactor >= 1) return zoomFactor + 1
+        else return 1 / (Math.round(1 / zoomFactor) - 1)
+    }
+    else return zoomFactor
 }
 
 const toggleStringInList = (x: string[], a: string) => {

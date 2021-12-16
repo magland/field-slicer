@@ -60,11 +60,19 @@ const WorkspaceView: FunctionComponent<Props> = ({data, width, height}) => {
     useEffect(() => {
         if (grid) {
             selectionDispatch({
+                type: 'setPanelLayoutMode',
+                panelLayoutMode: '4-panel'
+            })
+            selectionDispatch({
                 type: 'setFocusPosition',
                 focusPosition: [Math.floor(grid.Nx / 2), Math.floor(grid.Ny / 2), Math.floor(grid.Nz / 2)]
             })
         }
         else {
+            selectionDispatch({
+                type: 'setPanelLayoutMode',
+                panelLayoutMode: '3d-scene'
+            })
             selectionDispatch({
                 type: 'setFocusPosition',
                 focusPosition: undefined
