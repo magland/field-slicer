@@ -2,7 +2,7 @@ import { Checkbox, MenuItem, Radio, Select } from '@material-ui/core';
 import { JSONStringifyDeterministic } from 'figurl/viewInterface/kacheryTypes';
 import React, { FunctionComponent, useCallback } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
-import ZoomFactorControl from './controls/ZoomFactorControl';
+import ZoomFactorControl, { ArrowScaleFactorControl, BrightnessFactorControl } from './controls/ZoomFactorControl';
 import { GridScalarValue, VectorFieldComponentName, vectorFieldComponentNames, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
 
 type Props = {
@@ -67,9 +67,26 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
             type: 'toggleTransparentReferencePlanes'
         })
     }, [selectionDispatch])
+    const handleToggleShowReferenceLines = useCallback(() => {
+        selectionDispatch({
+            type: 'toggleShowReferenceLines'
+        })
+    }, [selectionDispatch])
     const handlePlaneViewZoom = useCallback((direction: number) => {
         selectionDispatch({
             type: 'planeViewZoom',
+            direction
+        })
+    }, [selectionDispatch])
+    const handlePlaneViewBrighten = useCallback((direction: number) => {
+        selectionDispatch({
+            type: 'planeViewBrighten',
+            direction
+        })
+    }, [selectionDispatch])
+    const handlePlaneViewScaleArrows = useCallback((direction: number) => {
+        selectionDispatch({
+            type: 'planeViewScaleArrows',
             direction
         })
     }, [selectionDispatch])
@@ -171,15 +188,21 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                 <h3>3D scene</h3>
                 <div>
                     <Checkbox
-                        checked={selection.referencePlaneOpts.show}
+                        checked={selection.scene3DOpts.showReferencePlanes}
                         onChange={handleToggleShowReferencePlanes}
                     /> Show reference planes
                 </div>
                 <div>
                     <Checkbox
-                        checked={selection.referencePlaneOpts.transparent}
+                        checked={selection.scene3DOpts.transparentReferencePlanes}
                         onChange={handleToggleTransparentReferencePlanes}
                     /> Transparent reference planes
+                </div>
+                <div>
+                    <Checkbox
+                        checked={selection.scene3DOpts.showReferenceLines}
+                        onChange={handleToggleShowReferenceLines}
+                    /> Show reference lines
                 </div>
             </div>
 
@@ -189,6 +212,16 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                 <ZoomFactorControl
                     value={selection.planeViewOpts.zoomFactor}
                     onZoom={handlePlaneViewZoom}
+                />
+                <div>&nbsp;</div>
+                <BrightnessFactorControl
+                    value={selection.planeViewOpts.brightnessFactor}
+                    onBrighten={handlePlaneViewBrighten}
+                />
+                <div>&nbsp;</div>
+                <ArrowScaleFactorControl
+                    value={selection.planeViewOpts.arrowScaleFactor}
+                    onScaleArrows={handlePlaneViewScaleArrows}
                 />
             </div>
         </div>

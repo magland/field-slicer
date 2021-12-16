@@ -4,13 +4,13 @@ import * as THREE from 'three';
 import { DoubleSide } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
-import { ReferencePlaneOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
+import { Scene3DOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 
 type Props = {
     grid?: WorkspaceGrid
     focusPosition?: Vec3
     surfaces: WorkspaceSurface[]
-    referencePlaneOpts: ReferencePlaneOpts
+    scene3DOpts: Scene3DOpts
     width: number
     height: number
 }
@@ -91,7 +91,7 @@ const surfaceMesh = (vertices: number[][], faces: number[][]) => {
     return obj
 }
 
-const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfaces, referencePlaneOpts, width, height}) => {
+const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfaces, scene3DOpts, width, height}) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
 
     const scene = useMemo(() => {
@@ -108,7 +108,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             const p1 = [grid.x0 + grid.dx * grid.Nx, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
             const focusPoint: [number, number, number] = [grid.x0 + focusPosition[0] * grid.dy, grid.y0 + focusPosition[1] * grid.dy, grid.z0 + focusPosition[2] * grid.dz]
 
-            const opts = {opacity: referencePlaneOpts.opacity, transparent: referencePlaneOpts.transparent}
+            const opts = {opacity: scene3DOpts.referencePlanesOpacity, transparent: scene3DOpts.transparentReferencePlanes}
             const planeXY = planeMesh([p0[0], p0[1], focusPoint[2]], [p1[0] - p0[0], 0, 0], [0, p1[1] - p0[1], 0], [0, 0, 1], 'rgb(120, 120, 150)', opts)
             const planeXZ = planeMesh([p0[0], focusPoint[1], p0[2]], [p1[0] - p0[0], 0, 0], [0, 0, p1[2] - p0[2]], [0, 1, 0], 'rgb(120, 150, 120)', opts)
             const planeYZ = planeMesh([focusPoint[0], p0[1], p0[2]], [0, p1[1] - p0[1], 0], [0, 0, p1[2] - p0[2]], [1, 0, 0], 'rgb(150, 120, 120)', opts)
@@ -117,10 +117,12 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             const lineZ = lineMesh(focusPoint, [focusPoint[0], focusPoint[1], grid.z0 + grid.Nz * grid.dz * 1.3], 'blue')
 
             
-            if (referencePlaneOpts.show) {
+            if (scene3DOpts.showReferencePlanes) {
                 objects.push(planeXY, planeXZ, planeYZ)
             }
-            objects.push(lineX, lineY, lineZ)
+            if (scene3DOpts.showReferenceLines) {
+                objects.push(lineX, lineY, lineZ)
+            }
         }
 
         for (let X of surfaces) {
@@ -129,7 +131,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             )
         }
         return objects
-    }, [focusPosition, grid, surfaces, referencePlaneOpts])
+    }, [focusPosition, grid, surfaces, scene3DOpts])
 
     const bbox = useMemo(() => {
         if (grid) {

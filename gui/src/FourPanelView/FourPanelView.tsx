@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
-import { PanelLayoutMode, PlaneViewOpts, ReferencePlaneOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
+import { PanelLayoutMode, PlaneViewOpts, Scene3DOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 import PanelMenu from './PanelMenu';
 import PlanePanelView from './PlanePanelView/PlanePanelView';
 import Scene3DPanelView from './Scene3DPanelView/Scene3DPanelView';
@@ -16,7 +16,7 @@ type Props = {
     arrowData?: number[][][][]
     arrowDataMax: number
     surfaces: WorkspaceSurface[]
-    referencePlaneOpts: ReferencePlaneOpts
+    scene3DOpts: Scene3DOpts
     planeViewOpts: PlaneViewOpts
     panelLayoutMode: PanelLayoutMode
     setPanelLayoutMode: (mode: PanelLayoutMode) => void
@@ -25,7 +25,7 @@ type Props = {
     height: number
 }
 
-const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, surfaces, referencePlaneOpts, planeViewOpts, panelLayoutMode, setPanelLayoutMode, onZoom, width, height}) => {
+const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, surfaces, scene3DOpts, planeViewOpts, panelLayoutMode, setPanelLayoutMode, onZoom, width, height}) => {
     const divStyles: {[key: string]: (React.CSSProperties & {width: number, height: number}) | undefined} = useMemo(() => {
         if (panelLayoutMode === '4-panel') {
             const W = width / 2
@@ -77,7 +77,7 @@ const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusP
                         surfaces={surfaces}
                         grid={grid}
                         focusPosition={focusPosition}
-                        referencePlaneOpts={referencePlaneOpts}
+                        scene3DOpts={scene3DOpts}
                     />
                 )}
             </div>

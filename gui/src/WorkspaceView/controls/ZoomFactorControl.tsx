@@ -24,4 +24,50 @@ const ZoomFactorControl: FunctionComponent<Props> = ({value, onZoom}) => {
     )
 }
 
+type BrightnessProps = {
+    value: number
+    onBrighten: (direction: number) => void
+}
+
+export const BrightnessFactorControl: FunctionComponent<BrightnessProps> = ({value, onBrighten}) => {
+    const v = value >= 1 ? `${value}` : (
+        `1/${Math.round(1 / value)}`
+    )
+    return (
+        <div>
+            <div>
+                Brightness factor: {v}
+            </div>
+            <div style={{userSelect: 'none'}}>
+                <Hyperlink onClick={() => onBrighten(1)}>Brighten</Hyperlink>
+                &nbsp;&nbsp;
+                <Hyperlink onClick={() => onBrighten(-1)}>Darken</Hyperlink>
+            </div>
+        </div>
+    )
+}
+
+type ArrowScaleProps = {
+    value: number
+    onScaleArrows: (direction: number) => void
+}
+
+export const ArrowScaleFactorControl: FunctionComponent<ArrowScaleProps> = ({value, onScaleArrows}) => {
+    const v = value >= 1 ? `${value}` : (
+        `1/${Math.round(1 / value)}`
+    )
+    return (
+        <div>
+            <div>
+                Arrow scale factor: {v}
+            </div>
+            <div style={{userSelect: 'none'}}>
+                <Hyperlink onClick={() => onScaleArrows(1)}>Lengthen</Hyperlink>
+                &nbsp;&nbsp;
+                <Hyperlink onClick={() => onScaleArrows(-1)}>Shorten</Hyperlink>
+            </div>
+        </div>
+    )
+}
+
 export default ZoomFactorControl

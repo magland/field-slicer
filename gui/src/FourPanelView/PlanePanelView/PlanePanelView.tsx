@@ -255,6 +255,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
                         N2={N2}
                         scale1={scale1}
                         scale2={scale2}
+                        brightnessFactor={planeViewOpts.brightnessFactor}
                         planeData={planeData}
                         planeDataRange={scalarDataRange}
                     />
@@ -273,6 +274,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
                             scale2={scale2}
                             focus={focus12}
                             fieldArrows={fieldArrows}
+                            arrowScaleFactor={planeViewOpts.arrowScaleFactor}
                         />
                     )
                 }

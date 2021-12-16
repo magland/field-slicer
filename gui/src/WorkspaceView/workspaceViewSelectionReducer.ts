@@ -11,14 +11,17 @@ export type GridScalarValue = {
     componentName: VectorFieldComponentName
 }
 
-export type ReferencePlaneOpts = {
-    show: boolean
-    transparent: boolean
-    opacity: number
+export type Scene3DOpts = {
+    showReferencePlanes: boolean
+    transparentReferencePlanes: boolean
+    referencePlanesOpacity: number
+    showReferenceLines: boolean
 }
 
 export type PlaneViewOpts = {
     zoomFactor: number
+    brightnessFactor: number
+    arrowScaleFactor: number
 }
 
 export type PanelLayoutMode = '4-panel' | '3d-scene' | 'XY' | 'XZ' | 'YZ'
@@ -29,19 +32,22 @@ export type WorkspaceViewSelection = {
     gridArrowVectorFieldName?: string
     focusPosition?: [number, number, number]
     visibleSurfaceNames?: string[]
-    referencePlaneOpts: ReferencePlaneOpts
+    scene3DOpts: Scene3DOpts
     planeViewOpts: PlaneViewOpts
     panelLayoutMode: PanelLayoutMode
 }
 
 export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
-    referencePlaneOpts: {
-        show: true,
-        transparent: true,
-        opacity: 0.7
+    scene3DOpts: {
+        showReferencePlanes: true,
+        transparentReferencePlanes: true,
+        showReferenceLines: true,
+        referencePlanesOpacity: 0.7
     },
     planeViewOpts: {
-        zoomFactor: 1
+        zoomFactor: 1,
+        brightnessFactor: 1,
+        arrowScaleFactor: 1
     },
     panelLayoutMode: '4-panel'
 }
@@ -72,7 +78,15 @@ export type WorkspaceViewSelectionAction = {
 } | {
     type: 'toggleTransparentReferencePlanes'
 } | {
+    type: 'toggleShowReferenceLines'
+} | {
     type: 'planeViewZoom'
+    direction: number
+} | {
+    type: 'planeViewBrighten'
+    direction: number
+} | {
+    type: 'planeViewScaleArrows'
     direction: number
 } | {
     type: 'setPanelLayoutMode'
@@ -102,13 +116,22 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
         return {...s, visibleSurfaceNames: a.surfaceNames}
     }
     else if (a.type === 'toggleShowReferencePlanes') {
-        return {...s, referencePlaneOpts: {...s.referencePlaneOpts, show: !s.referencePlaneOpts.show}}
+        return {...s, scene3DOpts: {...s.scene3DOpts, showReferencePlanes: !s.scene3DOpts.showReferencePlanes}}
     }
     else if (a.type === 'toggleTransparentReferencePlanes') {
-        return {...s, referencePlaneOpts: {...s.referencePlaneOpts, transparent: !s.referencePlaneOpts.transparent}}
+        return {...s, scene3DOpts: {...s.scene3DOpts, transparentReferencePlanes: !s.scene3DOpts.transparentReferencePlanes}}
+    }
+    else if (a.type === 'toggleShowReferenceLines') {
+        return {...s, scene3DOpts: {...s.scene3DOpts, showReferenceLines: !s.scene3DOpts.showReferenceLines}}
     }
     else if (a.type === 'planeViewZoom') {
         return {...s, planeViewOpts: {...s.planeViewOpts, zoomFactor: doZoom(s.planeViewOpts.zoomFactor, a.direction)}}
+    }
+    else if (a.type === 'planeViewBrighten') {
+        return {...s, planeViewOpts: {...s.planeViewOpts, brightnessFactor: doZoom(s.planeViewOpts.brightnessFactor, a.direction)}}
+    }
+    else if (a.type === 'planeViewScaleArrows') {
+        return {...s, planeViewOpts: {...s.planeViewOpts, arrowScaleFactor: doZoom(s.planeViewOpts.arrowScaleFactor, a.direction)}}
     }
     else if (a.type === 'setPanelLayoutMode') {
         return {...s, panelLayoutMode: a.panelLayoutMode}

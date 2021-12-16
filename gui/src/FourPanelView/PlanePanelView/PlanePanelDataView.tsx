@@ -8,6 +8,7 @@ type Props = {
     planeDataRange: [number, number]
     scale1: number
     scale2: number
+    brightnessFactor: number
 }
 
 type PaintProps = {
@@ -33,15 +34,18 @@ const paint = (context: CanvasRenderingContext2D, props: PaintProps) => {
     context.restore()
 }
 
-const PlanePanelDataView: FunctionComponent<Props> = ({planeData, N1, N2, planeDataRange, scale1, scale2}) => {
+const PlanePanelDataView: FunctionComponent<Props> = ({planeData, N1, N2, planeDataRange, scale1, scale2, brightnessFactor}) => {
     const imageData = useMemo(() => {
         const imageData = new ImageData(N1, N2)
         let i = 0
         for (let i2=0; i2<N2; i2++) {
             for (let i1=0; i1<N1; i1++) {
                 const v = planeData[i1][N2 - 1 - i2]
-                const frac = Math.max(0, Math.min(1, (v - planeDataRange[0]) / (planeDataRange[1] - planeDataRange[0])))
-                const a = Math.floor(frac * 255)
+                let frac = (v - planeDataRange[0]) / (planeDataRange[1] - planeDataRange[0])
+                frac *= brightnessFactor
+                const frac2 = Math.max(0, Math.min(1, frac))
+
+                const a = Math.floor(frac2 * 255)
                 imageData.data[i + 0] = a
                 imageData.data[i + 1] = a
                 imageData.data[i + 2] = a
@@ -50,7 +54,7 @@ const PlanePanelDataView: FunctionComponent<Props> = ({planeData, N1, N2, planeD
             }
         }
         return imageData
-    }, [N1, N2, planeData, planeDataRange])
+    }, [N1, N2, planeData, planeDataRange, brightnessFactor])
     const paintProps = useMemo(() => ({
         imageData, scale1, scale2
     }), [imageData, scale1, scale2])
