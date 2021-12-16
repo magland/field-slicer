@@ -47,12 +47,32 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
             gridVectorFieldName
         })
     }, [selectionDispatch])
+    const handleToggleVisibleSurface = useCallback((e: React.ChangeEvent<{
+        value: unknown
+    }>) => {
+        const surfaceName = e.target.value as string
+        selectionDispatch({
+            type: 'toggleVisibleSurface',
+            surfaceName
+        })
+    }, [selectionDispatch])
+    const handleToggleShowReferencePlanes = useCallback(() => {
+        selectionDispatch({
+            type: 'toggleShowReferencePlanes'
+        })
+    }, [selectionDispatch])
+    const handleToggleTransparentReferencePlanes = useCallback(() => {
+        selectionDispatch({
+            type: 'toggleTransparentReferencePlanes'
+        })
+    }, [selectionDispatch])
     return (
-        <div style={{padding: 10}}>
+        <div style={{padding: 10, overflowY: "auto"}}>
 
             {/* Select grid */}
             <div key="select-grid">
-                Grid: <Select
+                <h3>Grid</h3>
+                <Select
                     value={selection.gridName || '<undefined>'}
                     onChange={handleSelectedGridChanged}
                 >
@@ -67,6 +87,7 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
 
             {/* Grid vector fields */}
             <div key="grid-vector-fields">
+                <h3>Grid vector fields</h3>
                 {
                     data.gridVectorFields.filter(x => (x.gridName === selection.gridName)).map(x => (
                         <div key={x.name}>
@@ -96,6 +117,7 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
 
             {/* Grid scalar fields */}
             <div key="grid-scalar-fields">
+                <h3>Grid scalar fields</h3>
                 {
                     data.gridScalarFields.filter(x => (x.gridName === selection.gridName)).map(x => (
                         <div key={x.name}>
@@ -110,6 +132,48 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                         </div>
                     ))
                 }
+            </div>
+
+            {/* Surfaces */}
+            <div key="surfaces">
+                <h3>Surfaces</h3>
+                {
+                    data.surfaces.map(x => (
+                        <div key={x.name}>
+                            <div key="surface">Surface: {x.name}</div>
+                            <div key="show">
+                                <Checkbox
+                                    value={x.name}
+                                    checked={(selection.visibleSurfaceNames || []).includes(x.name)}
+                                    onChange={handleToggleVisibleSurface}
+                                /> show surface
+                            </div>
+                            <div key="surface-vector-fields">
+                                {/* todo */}
+                            </div>
+                            <div key="surface-scalar-fields">
+                                {/* todo */}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            {/* 3D Scene */}
+            <div key="3d-scene">
+                <h3>3D scene</h3>
+                <div>
+                    <Checkbox
+                        checked={selection.referencePlaneOpts.show}
+                        onChange={handleToggleShowReferencePlanes}
+                    /> Show reference planes
+                </div>
+                <div>
+                    <Checkbox
+                        checked={selection.referencePlaneOpts.transparent}
+                        onChange={handleToggleTransparentReferencePlanes}
+                    /> Transparent reference planes
+                </div>
             </div>
         </div>
     )

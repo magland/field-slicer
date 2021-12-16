@@ -30,7 +30,7 @@ const isWorkspaceGridData = (x: any): x is WorkspaceGrid => {
     }, {allowAdditionalFields: true})
 }
 
-type WorkspaceSurface = {
+export type WorkspaceSurface = {
     name: string
     vertices: number[][]
     faces: number[][]
@@ -44,7 +44,7 @@ const isWorkspaceSurfaceData = (x: any): x is WorkspaceSurface => {
     }, {allowAdditionalFields: true})
 }
 
-type WorkspaceGridVectorField = {
+export type WorkspaceGridVectorField = {
     name: string
     gridName: string
     data: number[][][][]
@@ -58,7 +58,7 @@ const isWorkspaceGridVectorFieldData = (x: any): x is WorkspaceGridVectorField =
     }, {allowAdditionalFields: true})
 }
 
-type WorkspaceGridScalarField = {
+export type WorkspaceGridScalarField = {
     name: string
     gridName: string
     data: number[][][]
@@ -148,7 +148,6 @@ type VolumeViewData = {
 } | {
     type: 'vector_field'
     dataUri: string
-    dataShap1: number[]
 } | {
     type: 'surface'
     numVertices: number

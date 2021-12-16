@@ -3,7 +3,7 @@ import React, { FunctionComponent, useEffect, useMemo, useReducer } from 'react'
 import { WorkspaceViewData } from 'VolumeViewData';
 import WorkspaceViewControlPanel from './WorkspaceViewControlPanel';
 import WorkspaceViewMainWindow from './WorkspaceViewMainWindow';
-import { workspaceViewSelectionReducer } from './workspaceViewSelectionReducer';
+import { defaultWorkspaceViewSelection, workspaceViewSelectionReducer } from './workspaceViewSelectionReducer';
 
 type Props = {
     data: WorkspaceViewData
@@ -12,7 +12,7 @@ type Props = {
 }
 
 const WorkspaceView: FunctionComponent<Props> = ({data, width, height}) => {
-    const [selection, selectionDispatch] = useReducer(workspaceViewSelectionReducer, {})
+    const [selection, selectionDispatch] = useReducer(workspaceViewSelectionReducer, defaultWorkspaceViewSelection)
     useEffect(() => {
         if (!selection.gridName) {
             const gridName = data.grids[0]?.name
@@ -20,6 +20,33 @@ const WorkspaceView: FunctionComponent<Props> = ({data, width, height}) => {
             selectionDispatch({
                 type: 'setGrid',
                 gridName
+            })
+        }
+        if (!selection.gridScalar) {
+            if (data.gridScalarFields.length > 0) {
+                selectionDispatch({
+                    type: 'setGridScalar',
+                    gridScalar: {
+                        type: 'scalarField',
+                        gridScalarFieldName: data.gridScalarFields[0].name
+                    }
+                })
+            }
+            else if (data.gridVectorFields.length > 0) {
+                selectionDispatch({
+                    type: 'setGridScalar',
+                    gridScalar: {
+                        type: 'vectorFieldComponent',
+                        gridVectorFieldName: data.gridVectorFields[0].name,
+                        componentName: 'magnitude'
+                    }
+                })
+            }
+        }
+        if (!selection.visibleSurfaceNames) {
+            selectionDispatch({
+                type: 'setVisibleSurfaceNames',
+                surfaceNames: data.surfaces.map(s => (s.name))
             })
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,5 +1,5 @@
-# On 12/10/21 produced output:
-# https://figurl.org/f?v=gs://figurl/volumeview-2&d=8e2d19eaa838930bc9e25dbc09afb7c6d719ede4&channel=flatiron1&label=Test%20volume%20view
+# On 12/16/21 produced output:
+# https://figurl.org/f?v=gs://figurl/volumeview-2&d=e9d66edac2246a9db4aca6c515d4b79aaa450796&channel=flatiron1&label=Test%20volumeview%20workspace
 
 import os
 import numpy as np
@@ -31,8 +31,12 @@ def main():
     W.add_grid_vector_field(name='field1', grid=grid, data=V)
 
     a = 30
-    vertices = np.array([[-a, -a, -a], [-a, -a, a], [-a, a, -a], [-a, a, a], [-a, -a, -a], [a, -a, a], [a, a, -a], [a, a, a]]).astype(np.float32)
-    faces = np.array([[0, 1, 2], [0, 2, 3], [4, 5, 6], [4, 6, 7], [0, 1, 4], [0, 4, 5], [2, 3, 6], [2, 6, 7]]).astype(np.int32)
+    vertices = np.array([[-a, -a, -a], [-a, -a, a], [-a, a, -a], [-a, a, a], [a, -a, -a], [a, -a, a], [a, a, -a], [a, a, a]]).astype(np.float32)
+    faces = np.array([
+        [0, 1, 3], [0, 3, 2], [4, 5, 7], [4, 7, 6], # [-a, *, *] [a, *, *]
+        [0, 1, 5], [0, 5, 4], [2, 3, 7], [2, 7, 6], # [*, -a, *] [*, a, *]
+        [0, 2, 6], [0, 6, 4], [1, 3, 7], [1, 7, 5]  # [*, *, -a] [*, *, a]
+    ]).astype(np.int32)
     surface = W.add_surface(name='surface1', vertices=vertices, faces=faces)
 
     b = np.array([[1, 1, 1, 1, 1, 1, 1, 1], [0, 1, 0, 1, 0, 1, 0, 1], [0, 0, 1, 1, 2, 2, 3, 3]]).astype(np.float32)

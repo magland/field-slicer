@@ -117,17 +117,23 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
         return data.grids.filter(x => (x.name === selection.gridName))[0]
     }, [selection.gridName, data.grids])
 
+    const visibleSurfaces = useMemo(() => (
+        data.surfaces.filter(s => ((selection.visibleSurfaceNames || []).includes(s.name)))
+    ), [data.surfaces, selection.visibleSurfaceNames])
+
     return (
         <FourPanelView
             width={width}
             height={height}
             grid={grid}
-            focusPosition={selection.focusPosition}
             scalarData={scalarData}
             scalarDataRange={scalarDataRange}
             arrowData={arrowData}
             arrowDataMax={arrowDataMax}
+            surfaces={visibleSurfaces}
+            focusPosition={selection.focusPosition}
             setFocusPosition={setFocusPosition}
+            referencePlaneOpts={selection.referencePlaneOpts}
         />
     )
 }

@@ -94,7 +94,7 @@ class Workspace:
             data['gridVectorFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
-                'data': X._data
+                'data': data_uri
             })
         for X in self._grid_scalar_fields:
             assert X._data.dtype in [np.float32]
@@ -103,7 +103,7 @@ class Workspace:
             data['gridScalarFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
-                'data': X._data
+                'data': data_uri
             })
         for X in self._grid_regions:
             assert X._data.dtype in [np.uint8]
@@ -112,7 +112,7 @@ class Workspace:
             data['gridRegions'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
-                'data': X._data
+                'data': data_uri
             })
         for X in self._surface_vector_fields:
             assert X._data.dtype in [np.float32]
@@ -121,7 +121,7 @@ class Workspace:
             data['surfaceVectorFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
-                'data': X._data
+                'data': data_uri
             })
         for X in self._surface_scalar_fields:
             assert X._data.dtype in [np.float32]
@@ -130,7 +130,7 @@ class Workspace:
             data['surfaceScalarFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
-                'data': X._data
+                'data': data_uri
             })
         for X in self._surface_regions:
             assert X._data.dtype in [np.uint8]
@@ -139,7 +139,7 @@ class Workspace:
             data['surfaceRegions'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
-                'data': X._data
+                'data': data_uri
             })
         F = fig.Figure(view_url='gs://figurl/volumeview-2', data=data)
         return F

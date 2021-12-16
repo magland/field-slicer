@@ -1,6 +1,8 @@
 import React, { FunctionComponent, useMemo } from 'react';
-import { WorkspaceGrid } from 'VolumeViewData';
+import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
+import { ReferencePlaneOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 import PlanePanelView from './PlanePanelView/PlanePanelView';
+import Scene3DPanelView from './Scene3DPanelView/Scene3DPanelView';
 
 export type Vec3 = [number, number, number]
 
@@ -12,11 +14,13 @@ type Props = {
     scalarDataRange: [number, number]
     arrowData?: number[][][][]
     arrowDataMax: number
+    surfaces: WorkspaceSurface[]
+    referencePlaneOpts: ReferencePlaneOpts
     width: number
     height: number
 }
 
-const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, width, height}) => {
+const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, surfaces, referencePlaneOpts, width, height}) => {
     const W = width / 2
     const H = height / 2
     const style0: React.CSSProperties = useMemo(() => ({
@@ -38,6 +42,16 @@ const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusP
     return (
         <div style={style0}>
             <div style={style1}>
+                {grid && focusPosition && (
+                    <Scene3DPanelView
+                        width={W}
+                        height={H}
+                        surfaces={surfaces}
+                        grid={grid}
+                        focusPosition={focusPosition}
+                        referencePlaneOpts={referencePlaneOpts}
+                    />
+                )}
             </div>
             <div style={style2}>
                 {grid && scalarData && focusPosition && (
