@@ -106,7 +106,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         if ((grid) && (focusPosition)) {
             const p0 = [grid.x0, grid.y0, grid.z0]
             const p1 = [grid.x0 + grid.dx * grid.Nx, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
-            const focusPoint: [number, number, number] = [grid.x0 + focusPosition[0] * grid.dy, grid.y0 + focusPosition[1] * grid.dy, grid.z0 + focusPosition[2] * grid.dz]
+            const focusPoint: [number, number, number] = [grid.x0 + focusPosition[0] * grid.dx, grid.y0 + focusPosition[1] * grid.dy, grid.z0 + focusPosition[2] * grid.dz]
 
             const opts = {opacity: scene3DOpts.referencePlanesOpacity, transparent: scene3DOpts.transparentReferencePlanes}
             const planeXY = planeMesh([p0[0], p0[1], focusPoint[2]], [p1[0] - p0[0], 0, 0], [0, p1[1] - p0[1], 0], [0, 0, 1], 'rgb(120, 120, 150)', opts)
