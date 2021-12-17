@@ -8,12 +8,6 @@ import PlanePanelFrameView from './PlanePanelFrameView';
 
 export type PlaneName = 'XY' | 'XZ' | 'YZ'
 
-export type FieldArrowOpts = {
-    show: boolean
-    stride: number
-    scale: number
-}
-
 export type FieldArrow = {
     x: number
     y: number
@@ -40,12 +34,6 @@ type DragState = {
     dragging?: boolean
     anchorMousePosition?: [number, number]
     anchorFocusPoint?: [number, number]
-}
-
-const fieldArrowOpts: FieldArrowOpts = {
-    show: true,
-    stride: 5,
-    scale: 20
 }
 
 const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, scalarData, scalarDataRange, arrowData, arrowDataMax, focusPosition, setFocusPosition, planeViewOpts, onZoom}) => {
@@ -119,11 +107,9 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
     const fieldArrows: FieldArrow[] | undefined = useMemo(() => {
         if (!arrowData) return undefined
         const fieldArrows: FieldArrow[] = []
-        if (!fieldArrowOpts) return fieldArrows
-        if (!fieldArrowOpts.show) return fieldArrows
-        const stride = fieldArrowOpts.stride
+        const stride = planeViewOpts.arrowStride
         const stride2 = Math.floor(stride / 2)
-        const arrowScale = fieldArrowOpts.scale / arrowDataMax * zoomFactor
+        const arrowScale = 20 / arrowDataMax * zoomFactor // 20 is hard-coded for now
         if (plane === 'XY') {
             if ((0 <= focusPosition[2]) && (focusPosition[2] < grid.Nz)) {
                 for (let i = 0; i < grid.Nx; i += stride) {
@@ -167,7 +153,7 @@ const PlanePanelView: FunctionComponent<Props> = ({width, height, plane, grid, s
             }
         }
         return fieldArrows
-    }, [plane, grid, focusPosition, arrowData, arrowDataMax, zoomFactor])
+    }, [plane, grid, focusPosition, arrowData, arrowDataMax, planeViewOpts.arrowStride, zoomFactor])
     
     const margin = 8
     const innerWidth = width - margin * 2

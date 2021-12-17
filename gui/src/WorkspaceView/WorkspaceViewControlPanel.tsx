@@ -2,7 +2,7 @@ import { Checkbox, MenuItem, Radio, Select } from '@material-ui/core';
 import { JSONStringifyDeterministic } from 'figurl/viewInterface/kacheryTypes';
 import React, { FunctionComponent, useCallback } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
-import ZoomFactorControl, { ArrowScaleFactorControl, BrightnessFactorControl } from './controls/ZoomFactorControl';
+import ZoomFactorControl, { ArrowScaleFactorControl, ArrowStrideControl, BrightnessFactorControl } from './controls/ZoomFactorControl';
 import { GridScalarValue, VectorFieldComponentName, vectorFieldComponentNames, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
 
 type Props = {
@@ -90,6 +90,12 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
             direction
         })
     }, [selectionDispatch])
+    const handlePlaneViewAdjustArrowStride = useCallback((direction: number) => {
+        selectionDispatch({
+            type: 'planeViewAdjustArrowStride',
+            direction
+        })
+    }, [selectionDispatch])
     return (
         <div style={{padding: 10, overflowY: "auto"}}>
 
@@ -116,9 +122,10 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                     data.gridVectorFields.filter(x => (x.gridName === selection.gridName)).map(x => (
                         <div key={x.name}>
                             <div key="grid-vector-field">{x.name}</div>
+                            <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
                             {
                                 vectorFieldComponentNames.map(a => (
-                                    <div key={a}>
+                                    <div key={a} style={{whiteSpace: 'nowrap'}}>
                                         <Radio
                                             value={JSON.stringify({gridVectorFieldName: x.name, componentName: a})}
                                             checked={gridScalarsAreEqual(selection.gridScalar, {type: 'vectorFieldComponent', gridVectorFieldName: x.name, componentName: a})}
@@ -127,6 +134,7 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                                     </div>
                                 ))
                             }
+                            </div>
                             <div key="arrows">
                                 <Checkbox
                                     value={x.name}
@@ -222,6 +230,11 @@ const WorkspaceViewControlPanel: FunctionComponent<Props> = ({data, selection, s
                 <ArrowScaleFactorControl
                     value={selection.planeViewOpts.arrowScaleFactor}
                     onScaleArrows={handlePlaneViewScaleArrows}
+                />
+                <div>&nbsp;</div>
+                <ArrowStrideControl
+                    value={selection.planeViewOpts.arrowStride}
+                    onAdjustArrowStride={handlePlaneViewAdjustArrowStride}
                 />
             </div>
         </div>

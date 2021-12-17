@@ -70,4 +70,24 @@ export const ArrowScaleFactorControl: FunctionComponent<ArrowScaleProps> = ({val
     )
 }
 
+type ArrowStrideProps = {
+    value: number
+    onAdjustArrowStride: (direction: number) => void
+}
+
+export const ArrowStrideControl: FunctionComponent<ArrowStrideProps> = ({value, onAdjustArrowStride}) => {
+    return (
+        <div>
+            <div>
+                Arrow stride: {value}
+            </div>
+            <div style={{userSelect: 'none'}}>
+                <Hyperlink onClick={() => onAdjustArrowStride(1)}>Increase</Hyperlink>
+                &nbsp;&nbsp;
+                <Hyperlink onClick={() => onAdjustArrowStride(-1)}>Decrease</Hyperlink>
+            </div>
+        </div>
+    )
+}
+
 export default ZoomFactorControl

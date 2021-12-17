@@ -22,6 +22,7 @@ export type PlaneViewOpts = {
     zoomFactor: number
     brightnessFactor: number
     arrowScaleFactor: number
+    arrowStride: number
 }
 
 export type PanelLayoutMode = '4-panel' | '3d-scene' | 'XY' | 'XZ' | 'YZ'
@@ -47,7 +48,8 @@ export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
     planeViewOpts: {
         zoomFactor: 1,
         brightnessFactor: 1,
-        arrowScaleFactor: 1
+        arrowScaleFactor: 1,
+        arrowStride: 3
     },
     panelLayoutMode: '4-panel'
 }
@@ -87,6 +89,9 @@ export type WorkspaceViewSelectionAction = {
     direction: number
 } | {
     type: 'planeViewScaleArrows'
+    direction: number
+} | {
+    type: 'planeViewAdjustArrowStride'
     direction: number
 } | {
     type: 'setPanelLayoutMode'
@@ -133,6 +138,9 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     else if (a.type === 'planeViewScaleArrows') {
         return {...s, planeViewOpts: {...s.planeViewOpts, arrowScaleFactor: doZoom(s.planeViewOpts.arrowScaleFactor, a.direction)}}
     }
+    else if (a.type === 'planeViewAdjustArrowStride') {
+        return {...s, planeViewOpts: {...s.planeViewOpts, arrowStride: adjustStride(s.planeViewOpts.arrowStride, a.direction)}}
+    }
     else if (a.type === 'setPanelLayoutMode') {
         return {...s, panelLayoutMode: a.panelLayoutMode}
     }
@@ -151,6 +159,17 @@ const doZoom = (zoomFactor: number, direction: number) => {
         else return 1 / (Math.round(1 / zoomFactor) - 1)
     }
     else return zoomFactor
+}
+
+const adjustStride = (stride: number, direction: number) => {
+    if (direction < 0) {
+        if (stride > 1) return stride - 1
+        else return stride
+    }
+    else if (direction > 0) {
+        return stride + 1
+    }
+    else return stride
 }
 
 const toggleStringInList = (x: string[], a: string) => {
