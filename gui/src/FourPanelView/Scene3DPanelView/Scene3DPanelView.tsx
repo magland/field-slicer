@@ -65,20 +65,23 @@ const lineMesh = (p1: [number, number, number], p2: [number, number, number], co
 }
 
 const surfaceMesh = (vertices: number[][], faces: number[][]) => {
-    const material = new THREE.MeshBasicMaterial( {
+    const material = new THREE.MeshPhongMaterial( {
         color: 'white',
-        wireframe: true
+        flatShading: true,
+        side: DoubleSide
     })
+    // const material = new THREE.MeshBasicMaterial( {
+    //     color: 'white',
+    //     wireframe: true
+    // })
 
     const geometry = new THREE.BufferGeometry()
 
     const indices0: number[] = [] // faces
     const vertices0 = []
-    const normals0 = []
 
     for (let v of vertices) {
         vertices0.push(v[0], v[1], v[2])
-        normals0.push(1, 0, 0) // don't know how to do this right now, so passing (1, 0, 0)
     }
     for (let f of faces) {
         indices0.push(f[0], f[1], f[2])
@@ -86,7 +89,7 @@ const surfaceMesh = (vertices: number[][], faces: number[][]) => {
     
     geometry.setIndex( indices0 );
     geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices0, 3 ) )
-    geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals0, 3 ) )
+    geometry.computeVertexNormals()
     const obj = new THREE.Mesh( geometry, material )
     return obj
 }
@@ -184,10 +187,12 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             scene.add(obj)
         }
 
-        const light = new THREE.HemisphereLight();
-		scene.add( light );
+        // const light = new THREE.HemisphereLight();
+        const lights = [new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
+        lights.forEach(l => scene.add(l))
 
         const render = () => {
+            lights[0].position.set(camera.position.x, camera.position.y, camera.position.z)
             renderer.render( scene, camera );
         }
         controls.addEventListener( 'change', render );
