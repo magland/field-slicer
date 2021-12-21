@@ -36,9 +36,8 @@ const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = fa
 }
 
 const planeMesh = (p0: [number, number, number], v1: [number, number, number], v2: [number, number, number], normal: [number, number, number], color: string, opts: {transparent: boolean, opacity: number}) => {
-    const material = new THREE.MeshPhongMaterial( {
+    const material = new THREE.MeshBasicMaterial( {
         color,
-        flatShading: true,
         side: DoubleSide,
         opacity: opts.opacity,
         transparent: opts.transparent
@@ -90,10 +89,6 @@ const surfaceMesh = (vertices: number[][], faces: number[][]) => {
         flatShading: true,
         side: DoubleSide
     })
-    // const material = new THREE.MeshBasicMaterial( {
-    //     color: 'white',
-    //     wireframe: true
-    // })
 
     const geometry = new THREE.BufferGeometry()
 
@@ -199,9 +194,6 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         container.appendChild(renderer.domElement)
         
         objects.forEach(obj => scene.add(obj))
-
-        // const lights = [new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
-        // lights.forEach(l => camera.add(l))
         
         scene.add(camera)
 
@@ -211,16 +203,6 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         controls.addEventListener( 'change', render );
         controls.update()
         render()
-
-        // let canceled = false
-        // const animate = () => {
-        //     if (canceled) return
-        //     requestAnimationFrame( animate );
-        //     // cube.rotation.x += 0.01;
-        //     // cube.rotation.y += 0.01;
-            
-        // };
-        // animate();
 
         return () => {
             controls.removeEventListener('change', render)

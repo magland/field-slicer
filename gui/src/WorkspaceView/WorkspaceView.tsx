@@ -80,6 +80,13 @@ const WorkspaceView: FunctionComponent<Props> = ({data, width, height}) => {
         }
     }, [grid])
 
+    useEffect(() => {
+        selectionDispatch({
+            type: 'setVisibleSurfaceNames',
+            surfaceNames: data.surfaces.map(S => (S.name))
+        })
+    }, [data.surfaces])
+
     return (
         <Splitter
             width={width}

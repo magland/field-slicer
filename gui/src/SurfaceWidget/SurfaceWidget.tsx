@@ -10,15 +10,13 @@ type Props = {
     height: number
 }
 
-
-
-const headlights = (cameraPosition: THREE.Vector3) => {
-    // return [new THREE.PointLight(0xff0000), new THREE.PointLight(0x0000ff)]
-    return [new THREE.PointLight(0xffffff, .5), new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
-}
-const headlight = () => {
-    return [new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
-}
+// const headlights = (cameraPosition: THREE.Vector3) => {
+//     // return [new THREE.PointLight(0xff0000), new THREE.PointLight(0x0000ff)]
+//     return [new THREE.PointLight(0xffffff, .5), new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
+// }
+// const headlight = () => {
+//     return [new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
+// }
 const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false) => {
     // A traditional three-light setup has the main shadow-generating light, or key light,
     // slightly above the camera and at an angle ~30-45 degrees to the subject;
