@@ -15,7 +15,7 @@ type Props = {
     height: number
 }
 
-const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false) => {
+const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false, extentX: number, extentY: number, extentZ: number) => {
     // A traditional three-light setup has the main shadow-generating light, or key light,
     // slightly above the camera and at an angle ~30-45 degrees to the subject;
     // the fill light comes from the other side and is softer and is trying to ensure shadows aren't
@@ -25,13 +25,13 @@ const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = fa
     // Adding these to the camera ensures they'll always be relative to the camera position and
     // use its coordinate system.
     const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
-    const keyLight = new THREE.SpotLight(colors[0], .60)
+    const keyLight = new THREE.SpotLight(colors[0], .5)
     const fillLight = new THREE.DirectionalLight(colors[1], .4)
     const rimLight = new THREE.DirectionalLight(colors[2], .3)
     ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
-    keyLight.position.set(7, 2, 0)
-    fillLight.position.set(-7, 2, 0)
-    rimLight.position.set(0, 1, -2)
+    keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
+    fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
+    rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
     rimLight.target = camera
 }
 
@@ -174,6 +174,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 6)
         const controls = new OrbitControls( camera, container )
         controls.target.set(p.x, p.y, p.z)
+        addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
         return {
             camera,
             controls
@@ -201,7 +202,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
 
         // const lights = [new THREE.PointLight(0xffffff, .5), new THREE.AmbientLight(0xffffff, 0.2)]
         // lights.forEach(l => camera.add(l))
-        addThreePointLights(camera)
+        
         scene.add(camera)
 
         const render = () => {
