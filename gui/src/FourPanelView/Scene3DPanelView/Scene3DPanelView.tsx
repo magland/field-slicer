@@ -15,10 +15,29 @@ type Props = {
     height: number
 }
 
+const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false, extentX: number, extentY: number, extentZ: number) => {
+    // A traditional three-light setup has the main shadow-generating light, or key light,
+    // slightly above the camera and at an angle ~30-45 degrees to the subject;
+    // the fill light comes from the other side and is softer and is trying to ensure shadows aren't
+    // too dramatic;
+    // then a rim light opposite the camera provides additional highlights to the object edges.
+    // The key light should be the brightest light source.
+    // Adding these to the camera ensures they'll always be relative to the camera position and
+    // use its coordinate system.
+    const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
+    const keyLight = new THREE.SpotLight(colors[0], .5)
+    const fillLight = new THREE.DirectionalLight(colors[1], .4)
+    const rimLight = new THREE.DirectionalLight(colors[2], .3)
+    ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
+    keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
+    fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
+    rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
+    rimLight.target = camera
+}
+
 const planeMesh = (p0: [number, number, number], v1: [number, number, number], v2: [number, number, number], normal: [number, number, number], color: string, opts: {transparent: boolean, opacity: number}) => {
-    const material = new THREE.MeshPhongMaterial( {
+    const material = new THREE.MeshBasicMaterial( {
         color,
-        flatShading: true,
         side: DoubleSide,
         opacity: opts.opacity,
         transparent: opts.transparent
@@ -65,20 +84,19 @@ const lineMesh = (p1: [number, number, number], p2: [number, number, number], co
 }
 
 const surfaceMesh = (vertices: number[][], faces: number[][]) => {
-    const material = new THREE.MeshBasicMaterial( {
+    const material = new THREE.MeshPhongMaterial( {
         color: 'white',
-        wireframe: true
+        flatShading: true,
+        side: DoubleSide
     })
 
     const geometry = new THREE.BufferGeometry()
 
     const indices0: number[] = [] // faces
     const vertices0 = []
-    const normals0 = []
 
     for (let v of vertices) {
         vertices0.push(v[0], v[1], v[2])
-        normals0.push(1, 0, 0) // don't know how to do this right now, so passing (1, 0, 0)
     }
     for (let f of faces) {
         indices0.push(f[0], f[1], f[2])
@@ -86,7 +104,7 @@ const surfaceMesh = (vertices: number[][], faces: number[][]) => {
     
     geometry.setIndex( indices0 );
     geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices0, 3 ) )
-    geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals0, 3 ) )
+    geometry.computeVertexNormals()
     const obj = new THREE.Mesh( geometry, material )
     return obj
 }
@@ -151,6 +169,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 6)
         const controls = new OrbitControls( camera, container )
         controls.target.set(p.x, p.y, p.z)
+        addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
         return {
             camera,
             controls
@@ -174,18 +193,9 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         while (container.firstChild) container.removeChild(container.firstChild)
         container.appendChild(renderer.domElement)
         
-        // var cube = new THREE.Mesh( geometry, material );
-        // scene.add( cube );
-
-        // const mesh = new THREE.Mesh( getMeshGeometry(), material );
-        // scene.add(mesh)
-
-        for (let obj of objects) {
-            scene.add(obj)
-        }
-
-        const light = new THREE.HemisphereLight();
-		scene.add( light );
+        objects.forEach(obj => scene.add(obj))
+        
+        scene.add(camera)
 
         const render = () => {
             renderer.render( scene, camera );
@@ -193,16 +203,6 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         controls.addEventListener( 'change', render );
         controls.update()
         render()
-
-        // let canceled = false
-        // const animate = () => {
-        //     if (canceled) return
-        //     requestAnimationFrame( animate );
-        //     // cube.rotation.x += 0.01;
-        //     // cube.rotation.y += 0.01;
-            
-        // };
-        // animate();
 
         return () => {
             controls.removeEventListener('change', render)
