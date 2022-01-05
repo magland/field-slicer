@@ -1,5 +1,6 @@
 import FourPanelView, { Vec3 } from 'FourPanelView/FourPanelView';
 import { allocateZeros3d } from 'FourPanelView/PlanePanelView/PlanePanelView';
+import { SurfaceData } from 'FourPanelView/Scene3DPanelView/Scene3DPanelView';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
 import { PanelLayoutMode, VectorFieldComponentName, WorkspaceViewSelection, WorkspaceViewSelectionAction } from './workspaceViewSelectionReducer';
@@ -79,6 +80,22 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
     }, [scalarData])
     const scalarDataRange: [number, number] = useMemo(() => ([vMin, vMax]), [vMin, vMax])
 
+    const {svMin, svMax} = useMemo(() => {
+        const names = Object.values(selection.selectedSurfaceScalarFieldNames).filter(a => (a !== undefined)).map(a => (a as string))
+        const scalarFields = names.map(name => (data.surfaceScalarFields.filter(x => (x.name === name))[0]))
+        if (scalarFields.length === 0) return {svMin: 0, svMax: 1}
+        let svMin = scalarFields[0].data[0]
+        let svMax = scalarFields[0].data[0]
+        for (let X of scalarFields) {
+            for (let v of X.data) {
+                svMin = Math.min(svMin, v)
+                svMax = Math.max(svMax, v)
+            }
+        }
+        return {svMin, svMax}
+    }, [selection.selectedSurfaceScalarFieldNames, data.surfaceScalarFields])
+    const surfaceScalarDataRange: [number, number] = useMemo(() => ([svMin, svMax]), [svMin, svMax])
+
     const arrowData = useMemo(() => {
         const name = selection.gridArrowVectorFieldName
         if (!name) return undefined
@@ -117,9 +134,20 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
         return data.grids.filter(x => (x.name === selection.gridName))[0]
     }, [selection.gridName, data.grids])
 
-    const visibleSurfaces = useMemo(() => (
-        data.surfaces.filter(s => ((selection.visibleSurfaceNames || []).includes(s.name)))
-    ), [data.surfaces, selection.visibleSurfaceNames])
+    const surfacesData: SurfaceData[] = useMemo(() => {
+        const visibleSurfaces = data.surfaces.filter(s => ((selection.visibleSurfaceNames || []).includes(s.name)))
+        return visibleSurfaces.map(S => {
+            const scalarFieldName = selection.selectedSurfaceScalarFieldNames[S.name]
+            const scalarField = scalarFieldName ? data.surfaceScalarFields.filter(x => (x.name === scalarFieldName))[0] : undefined
+            const vectorFieldName = selection.selectedSurfaceVectorFieldNames[S.name]
+            const vectorField = vectorFieldName ? data.surfaceVectorFields.filter(x => (x.name === vectorFieldName))[0] : undefined
+            return {
+                surface: S,
+                scalarField,
+                vectorField
+            }
+        })
+    }, [data.surfaces, selection.visibleSurfaceNames, selection.selectedSurfaceScalarFieldNames, selection.selectedSurfaceVectorFieldNames, data.surfaceScalarFields, data.surfaceVectorFields])
 
     const handleSetPanelLayoutMode = useCallback((panelLayoutMode: PanelLayoutMode) => {
         selectionDispatch({
@@ -144,7 +172,8 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
             scalarDataRange={scalarDataRange}
             arrowData={arrowData}
             arrowDataMax={arrowDataMax}
-            surfaces={visibleSurfaces}
+            surfacesData={surfacesData}
+            surfaceScalarDataRange={surfaceScalarDataRange}
             focusPosition={selection.focusPosition}
             setFocusPosition={setFocusPosition}
             scene3DOpts={selection.scene3DOpts}

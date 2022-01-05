@@ -96,7 +96,7 @@ const Volume3DScene: FunctionComponent<Props> = ({volumeData, componentNames, co
         if (!container) return {camera: undefined, controls: undefined}
         const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
         const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
-        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 6)
+        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
         const controls = new OrbitControls( camera, container )
         controls.target.set(p.x, p.y, p.z)
         return {

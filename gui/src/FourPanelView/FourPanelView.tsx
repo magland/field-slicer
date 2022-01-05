@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useMemo } from 'react';
-import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
+import { WorkspaceGrid } from 'VolumeViewData';
 import { PanelLayoutMode, PlaneViewOpts, Scene3DOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
 import PanelMenu from './PanelMenu';
 import PlanePanelView from './PlanePanelView/PlanePanelView';
-import Scene3DPanelView from './Scene3DPanelView/Scene3DPanelView';
+import Scene3DPanelView, { SurfaceData } from './Scene3DPanelView/Scene3DPanelView';
 
 export type Vec3 = [number, number, number]
 
@@ -15,7 +15,8 @@ type Props = {
     scalarDataRange: [number, number]
     arrowData?: number[][][][]
     arrowDataMax: number
-    surfaces: WorkspaceSurface[]
+    surfacesData: SurfaceData[]
+    surfaceScalarDataRange: [number, number]
     scene3DOpts: Scene3DOpts
     planeViewOpts: PlaneViewOpts
     panelLayoutMode: PanelLayoutMode
@@ -25,7 +26,7 @@ type Props = {
     height: number
 }
 
-const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, surfaces, scene3DOpts, planeViewOpts, panelLayoutMode, setPanelLayoutMode, onZoom, width, height}) => {
+const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusPosition, scalarData, scalarDataRange, arrowData, arrowDataMax, surfacesData, surfaceScalarDataRange, scene3DOpts, planeViewOpts, panelLayoutMode, setPanelLayoutMode, onZoom, width, height}) => {
     const divStyles: {[key: string]: (React.CSSProperties & {width: number, height: number}) | undefined} = useMemo(() => {
         if (panelLayoutMode === '4-panel') {
             const W = width / 2
@@ -74,7 +75,8 @@ const FourPanelView: FunctionComponent<Props> = ({grid, focusPosition, setFocusP
                     <Scene3DPanelView
                         width={divStyles.W11.width}
                         height={divStyles.W11.height}
-                        surfaces={surfaces}
+                        surfacesData={surfacesData}
+                        surfaceScalarDataRange={surfaceScalarDataRange}
                         grid={grid}
                         focusPosition={focusPosition}
                         scene3DOpts={scene3DOpts}
