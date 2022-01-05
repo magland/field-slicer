@@ -20,8 +20,8 @@ def main():
     F = W.create_figure()
     url = F.url(label='red blood cell')
     print(url)
-    # 1/4/2022
-    # https://figurl.org/f?v=gs://figurl/volumeview-2&d=9afbb086ff7f7bb37528f30bdf0364e2b5a9c1f6&channel=flatiron1&label=red%20blood%20cell
+    # 1/5/2022
+    # https://figurl.org/f?v=gs://figurl/volumeview-2&d=23fc9b910249a2934093fb68fcac48968ce8fa40&channel=flatiron1&label=red%20blood%20cell
 
 if __name__ == '__main__':
     main()
