@@ -1,6 +1,3 @@
-# On 12/10/21 produced output:
-# https://figurl.org/f?v=gs://figurl/volumeview-2&d=eae895acdc1de9b70be60849600022a7a6404e6b&channel=flatiron1&label=red%20blood%20cell
-
 import kachery_client as kc
 import volumeview as vv
 
@@ -15,11 +12,16 @@ def main():
     # faces is m x 3 array of vertex indices for triangular mesh
 
     W = vv.Workspace()
-    W.add_surface(name='red-blood-cell', vertices=vertices, faces=faces)
+    S = W.add_surface(name='red-blood-cell', vertices=vertices, faces=faces)
+    W.add_surface_scalar_field(name='scalarX', surface=S, data=vertices[:, 0])
+    W.add_surface_scalar_field(name='scalarY', surface=S, data=vertices[:, 1])
+    W.add_surface_scalar_field(name='scalarZ', surface=S, data=vertices[:, 2])
 
     F = W.create_figure()
     url = F.url(label='red blood cell')
     print(url)
+    # 1/5/2022
+    # https://figurl.org/f?v=gs://figurl/volumeview-2&d=23fc9b910249a2934093fb68fcac48968ce8fa40&channel=flatiron1&label=red%20blood%20cell
 
 if __name__ == '__main__':
     main()
