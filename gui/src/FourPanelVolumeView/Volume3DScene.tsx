@@ -2,8 +2,9 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { DoubleSide } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Coord3 } from './FourPanelVolumeView';
 import "./VolumeViewControl.css";
+
+type Coord3 = [number, number, number]
 
 type Props = {
     volumeData: number[][][][]
