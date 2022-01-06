@@ -33,6 +33,8 @@ export type WorkspaceViewSelection = {
     gridArrowVectorFieldName?: string
     focusPosition?: [number, number, number]
     visibleSurfaceNames?: string[]
+    selectedSurfaceScalarFieldNames: {[key: string]: string | undefined}
+    selectedSurfaceVectorFieldNames: {[key: string]: string | undefined}
     scene3DOpts: Scene3DOpts
     planeViewOpts: PlaneViewOpts
     panelLayoutMode: PanelLayoutMode
@@ -51,6 +53,8 @@ export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
         arrowScaleFactor: 1,
         arrowStride: 3
     },
+    selectedSurfaceScalarFieldNames: {},
+    selectedSurfaceVectorFieldNames: {},
     panelLayoutMode: '4-panel'
 }
 
@@ -96,6 +100,14 @@ export type WorkspaceViewSelectionAction = {
 } | {
     type: 'setPanelLayoutMode'
     panelLayoutMode: PanelLayoutMode
+} | {
+    type: 'toggleSelectedSurfaceScalarField'
+    surfaceScalarFieldName: string
+    surfaceName: string
+} | {
+    type: 'toggleSelectedSurfaceVectorField'
+    surfaceVectorFieldName: string
+    surfaceName: string
 }
 
 export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: WorkspaceViewSelectionAction): WorkspaceViewSelection => {
@@ -143,6 +155,28 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     }
     else if (a.type === 'setPanelLayoutMode') {
         return {...s, panelLayoutMode: a.panelLayoutMode}
+    }
+    else if (a.type === 'toggleSelectedSurfaceScalarField') {
+        const name = s.selectedSurfaceScalarFieldNames[a.surfaceName]
+        const X = {...s.selectedSurfaceScalarFieldNames}
+        if ((name) && (name === a.surfaceScalarFieldName)) {
+            X[a.surfaceName] = undefined
+        }
+        else {
+            X[a.surfaceName] = a.surfaceScalarFieldName
+        }
+        return {...s, selectedSurfaceScalarFieldNames: X}
+    }
+    else if (a.type === 'toggleSelectedSurfaceVectorField') {
+        const name = s.selectedSurfaceVectorFieldNames[a.surfaceName]
+        const X = {...s.selectedSurfaceVectorFieldNames}
+        if ((name) && (name === a.surfaceVectorFieldName)) {
+            X[a.surfaceName] = undefined
+        }
+        else {
+            X[a.surfaceName] = a.surfaceVectorFieldName
+        }
+        return {...s, selectedSurfaceVectorFieldNames: X}
     }
     else {
         throw Error('Unexpected action type')
