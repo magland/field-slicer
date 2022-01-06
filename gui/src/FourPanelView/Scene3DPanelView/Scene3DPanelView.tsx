@@ -3,13 +3,20 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { DoubleSide } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { WorkspaceGrid, WorkspaceSurface } from 'VolumeViewData';
+import { WorkspaceGrid, WorkspaceSurface, WorkspaceSurfaceScalarField, WorkspaceSurfaceVectorField } from 'VolumeViewData';
 import { Scene3DOpts } from 'WorkspaceView/workspaceViewSelectionReducer';
+
+export type SurfaceData = {
+    surface: WorkspaceSurface
+    scalarField?: WorkspaceSurfaceScalarField
+    vectorField?: WorkspaceSurfaceVectorField
+}
 
 type Props = {
     grid?: WorkspaceGrid
     focusPosition?: Vec3
-    surfaces: WorkspaceSurface[]
+    surfacesData: SurfaceData[]
+    surfaceScalarDataRange: [number, number]
     scene3DOpts: Scene3DOpts
     width: number
     height: number
@@ -83,11 +90,12 @@ const lineMesh = (p1: [number, number, number], p2: [number, number, number], co
     return line
 }
 
-const surfaceMesh = (vertices: number[][], faces: number[][]) => {
+const surfaceMesh = (vertices: number[][], faces: number[][], scalarData: number[] | undefined, scalarDataRange: [number, number]) => {
     const material = new THREE.MeshPhongMaterial( {
         color: 'white',
         flatShading: true,
-        side: DoubleSide
+        side: DoubleSide,
+        vertexColors: scalarData ? true : false
     })
 
     const geometry = new THREE.BufferGeometry()
@@ -105,11 +113,23 @@ const surfaceMesh = (vertices: number[][], faces: number[][]) => {
     geometry.setIndex( indices0 );
     geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices0, 3 ) )
     geometry.computeVertexNormals()
+
+    if (scalarData) {
+        const color = new Float32Array(3 * vertices.length)
+        for (let i = 0; i < vertices.length; i++) {
+            const rgb = colorForValue((scalarData[i] - scalarDataRange[0]) / (scalarDataRange[1] - scalarDataRange[0]))
+            color[i * 3 + 0] = rgb[0]
+            color[i * 3 + 1] = rgb[1]
+            color[i * 3 + 2] = rgb[2]
+        }
+        geometry.setAttribute('color', new THREE.BufferAttribute(color, 3))
+    }
+
     const obj = new THREE.Mesh( geometry, material )
     return obj
 }
 
-const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfaces, scene3DOpts, width, height}) => {
+const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfacesData, surfaceScalarDataRange, scene3DOpts, width, height}) => {
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
 
     const scene = useMemo(() => {
@@ -143,13 +163,13 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             }
         }
 
-        for (let X of surfaces) {
+        for (let X of surfacesData) {
             objects.push(
-                surfaceMesh(X.vertices, X.faces)
+                surfaceMesh(X.surface.vertices, X.surface.faces, X.scalarField?.data, surfaceScalarDataRange)
             )
         }
         return objects
-    }, [focusPosition, grid, surfaces, scene3DOpts])
+    }, [focusPosition, grid, surfacesData, scene3DOpts, surfaceScalarDataRange])
 
     const bbox = useMemo(() => {
         if (grid) {
@@ -158,15 +178,15 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
             return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]))
         }
         else {
-            return getBoundingBoxForSurfaces(surfaces)
+            return getBoundingBoxForSurfaces(surfacesData.map(x => (x.surface)))
         }
-    }, [grid, surfaces])
+    }, [grid, surfacesData])
 
     const {camera, controls} = useMemo(() => {
         if (!container) return {camera: undefined, controls: undefined}
         const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
         const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
-        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 6)
+        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
         const controls = new OrbitControls( camera, container )
         controls.target.set(p.x, p.y, p.z)
         addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
@@ -236,6 +256,15 @@ const min = (a: number[]) => {
 
 const max = (a: number[]) => {
     return a.reduce((prev, current) => (prev > current) ? prev : current, a[0] || 0)
+}
+
+const colorForValue = (v: number) => {
+    const v2 = Math.min(1, Math.max(0, v))
+    const r = v2
+    const g = 0.5
+    const b = 1 - v2
+
+    return [r, g, b]
 }
 
 export default Scene3DPanelView

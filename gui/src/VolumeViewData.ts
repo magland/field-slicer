@@ -86,7 +86,7 @@ const isWorkspaceGridRegionData = (x: any): x is WorkspaceGridRegion => {
     }, {allowAdditionalFields: true})
 }
 
-type WorkspaceSurfaceVectorField = {
+export type WorkspaceSurfaceVectorField = {
     name: string
     surfaceName: string
     data: number[][]
@@ -100,7 +100,7 @@ const isWorkspaceSurfaceVectorFieldData = (x: any): x is WorkspaceSurfaceVectorF
     }, {allowAdditionalFields: true})
 }
 
-type WorkspaceSurfaceScalarField = {
+export type WorkspaceSurfaceScalarField = {
     name: string
     surfaceName: string
     data: number[]
