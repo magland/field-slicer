@@ -31,18 +31,16 @@ const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = fa
     // The key light should be the brightest light source.
     // Adding these to the camera ensures they'll always be relative to the camera position and
     // use its coordinate system.
-    // const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
-    // const keyLight = new THREE.SpotLight(colors[0], .5)
-    // const fillLight = new THREE.DirectionalLight(colors[1], .4)
-    // const rimLight = new THREE.DirectionalLight(colors[2], .3)
+    const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
+    const keyLight = new THREE.SpotLight(colors[0], .5)
+    const fillLight = new THREE.DirectionalLight(colors[1], .4)
+    const rimLight = new THREE.DirectionalLight(colors[2], .3)
     // ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
-    // keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
-    // fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
-    // rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
-    // rimLight.target = camera
-
-    const pointLight = new THREE.PointLight(0xffffff, 0.7)
-    camera.add(pointLight)
+    camera.add(fillLight)
+    keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
+    fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
+    rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
+    rimLight.target = camera
 }
 
 const planeMesh = (p0: [number, number, number], v1: [number, number, number], v2: [number, number, number], normal: [number, number, number], color: string, opts: {transparent: boolean, opacity: number}) => {
@@ -141,6 +139,37 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         return scene
     }, [])
 
+    const bbox = useMemo(() => {
+        if (grid) {
+            const p0 = [grid.x0, grid.y0, grid.z0]
+            const p1 = [grid.x0 + grid.dx * grid.Ny, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
+            return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]))
+        }
+        else {
+            return getBoundingBoxForSurfaces(surfacesData.map(x => (x.surface)))
+        }
+    }, [grid, surfacesData])
+
+    const p = useMemo(() => {
+        const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
+        return p
+    }, [bbox])
+
+    const {camera, controls} = useMemo(() => {
+        if (!container) return {camera: undefined, controls: undefined, light: undefined}
+        const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
+        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
+        const controls = new OrbitControls( camera, container )
+        controls.target.set(p.x, p.y, p.z)
+        // addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
+        const light = new THREE.PointLight(0xffffff, 0.7)
+        camera.add(light)
+        return {
+            camera,
+            controls
+        }
+    }, [width, height, bbox, p, container])
+
     const objects = useMemo(() => {
         const objects: THREE.Object3D[] = []
 
@@ -171,33 +200,15 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
                 surfaceMesh(X.surface.vertices, X.surface.faces, X.scalarField?.data, surfaceScalarDataRange)
             )
         }
+
+        // // In case we want to show the bounding box:
+        // const geometry = new THREE.BoxGeometry( bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z )
+        // geometry.translate( p.x, p.y, p.z )
+        // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: true} )
+        // objects.push(new THREE.Mesh(geometry, material))
+
         return objects
     }, [focusPosition, grid, surfacesData, scene3DOpts, surfaceScalarDataRange])
-
-    const bbox = useMemo(() => {
-        if (grid) {
-            const p0 = [grid.x0, grid.y0, grid.z0]
-            const p1 = [grid.x0 + grid.dx * grid.Ny, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
-            return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0], p1[1], p1[2]))
-        }
-        else {
-            return getBoundingBoxForSurfaces(surfacesData.map(x => (x.surface)))
-        }
-    }, [grid, surfacesData])
-
-    const {camera, controls} = useMemo(() => {
-        if (!container) return {camera: undefined, controls: undefined}
-        const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
-        const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
-        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
-        const controls = new OrbitControls( camera, container )
-        controls.target.set(p.x, p.y, p.z)
-        addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
-        return {
-            camera,
-            controls
-        }
-    }, [width, height, bbox, container])
 
     const renderer = useMemo(() => {
         const renderer = new THREE.WebGLRenderer();
@@ -230,7 +241,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         return () => {
             controls.removeEventListener('change', render)
         }
-    }, [renderer, camera, container, controls, height, objects, width, scene])
+    }, [renderer, camera, container, controls, height, objects, width, scene, p])
 
     return (
         <div ref={setContainer} />
