@@ -47,7 +47,6 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
     const fieldTtoggler = useCallback((name: string, fieldType: 'scalar' | 'vector') => {
         const type = fieldType === 'scalar' ? 'toggleSelectedSurfaceScalarField' : 'toggleSelectedSurfaceVectorField'
         const [ surfaceName, surfaceFieldName ] = name.split(separator)
-        console.log(`Dispatching for ${surfaceName} ${surfaceFieldName} from ${name}`)
         selectionDispatch({ type, surfaceName, surfaceFieldName })
     }, [selectionDispatch])
 
