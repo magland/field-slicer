@@ -14,6 +14,7 @@ type SurfaceSelectionControlProps = {
 type PerSurfaceControlsProps = {
     name: string
     displayed: boolean
+    synchronized: boolean
     scalarFields: WorkspaceSurfaceScalarField[]
     vectorFields: WorkspaceSurfaceVectorField[]
     selectedScalarFieldName?: string
@@ -25,10 +26,19 @@ type PerSurfaceControlsProps = {
 
 type FieldSelectorProps = {
     surfaceName: string
-    fields: WorkspaceSurfaceScalarField[] | WorkspaceSurfaceVectorField[]
+    fieldNames: string[]
     selectedFieldName?: string
     type: 'vector' | 'scalar'
     callback: any
+}
+
+type SynchronizedFieldSelectionProps = {
+    scalarFields: Set<string>  //string[]
+    vectorFields: Set<string>  //string[]
+    selectedScalarField?: string
+    selectedVectorField?: string
+    selectScalarFieldsCallback: any
+    selectVectorFieldsCallback: any
 }
 
 type ChangeEvent = React.ChangeEvent<{value: unknown}>
@@ -36,29 +46,9 @@ type ChangeEvent = React.ChangeEvent<{value: unknown}>
 const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> = (props: SurfaceSelectionControlProps) => {
     const { data, selection, selectionDispatch } = props
 
-    const handleToggleVisibleSurface = useCallback((e: ChangeEvent) => {
-        const surfaceName = e.target.value as string
-        selectionDispatch({
-            type: 'toggleVisibleSurface',
-            surfaceName
-        })
-    }, [selectionDispatch])
+    const allSurfaceNames = useMemo(() => data.surfaces.map(s => s.name), [data.surfaces])
 
-    const fieldTtoggler = useCallback((name: string, fieldType: 'scalar' | 'vector') => {
-        const type = fieldType === 'scalar' ? 'toggleSelectedSurfaceScalarField' : 'toggleSelectedSurfaceVectorField'
-        const [ surfaceName, surfaceFieldName ] = name.split(separator)
-        selectionDispatch({ type, surfaceName, surfaceFieldName })
-    }, [selectionDispatch])
-
-    const handleToggleSelectedScalarField = useCallback((e: ChangeEvent) => {
-        fieldTtoggler(e.target.value as string, 'scalar')
-    }, [fieldTtoggler])
-
-    const handleToggleSelectedVectorField = useCallback((e: ChangeEvent) => {
-        fieldTtoggler(e.target.value as string, 'vector')
-    }, [fieldTtoggler])
-
-    // This is probably not a huge performance boost, but we expect the underlying data to change rarely,
+    // This is probably not performance-significant, but we expect the underlying data to change less frequently,
     // while the selection state will change much more frequently.
     // Might as well memoize the filtering that matches surfaces to fields, so we don't need to re-filter
     // every time a selection state changes.
@@ -83,14 +73,63 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
         }
     })), [surfacesWithFields, selection.selectedSurfaceVectorFieldNames, selection.selectedSurfaceScalarFieldNames, selection.visibleSurfaceNames])
 
+    const allFieldNames = useMemo(() => {
+        // TODO: sort these & return as array?
+        const scalarFields = new Set(data.surfaceScalarFields.map(f => f.name))
+        const vectorFields = new Set(data.surfaceVectorFields.map(f => f.name))
+        return { scalarFields: scalarFields, vectorFields: vectorFields }
+    }, [data.surfaceScalarFields, data.surfaceVectorFields])
+
+    const sharedSelectedScalarFieldName = useMemo(() => ( selection.selectedSurfaceScalarFieldNames[allSurfaceNames[0]] ?? ''),
+        [selection.selectedSurfaceScalarFieldNames, allSurfaceNames])
+    const sharedSelectedVectorFieldName = useMemo(() => ( selection.selectedSurfaceVectorFieldNames[allSurfaceNames[0]] ?? ''),
+        [selection.selectedSurfaceVectorFieldNames, allSurfaceNames])
+
+    const handleToggleVisibleSurface = useCallback((e: ChangeEvent) => {
+        const surfaceName = e.target.value as string
+        selectionDispatch({
+            type: 'toggleVisibleSurface',
+            surfaceName
+        })
+    }, [selectionDispatch])
+
+    const fieldToggler = useCallback((name: string, fieldType: 'scalar' | 'vector') => {
+        const type = fieldType === 'scalar' ? 'toggleSelectedSurfaceScalarField' : 'toggleSelectedSurfaceVectorField'
+        // The reducer doesn't actually know the names of non-displayed surfaces--it doesn't see the data.
+        // So to synchronize hidden surfaces properly, we have to provide the full list of known surface names.
+        // The sign to do that is when the provided surface name is blank.
+        const [ givenSurfaceName, surfaceFieldName ] = name.split(separator)
+        const surfaceNames = givenSurfaceName ? [givenSurfaceName] : allSurfaceNames
+        selectionDispatch({ type, surfaceFieldName, surfaceNames })
+    }, [selectionDispatch, allSurfaceNames])
+
+    const handleToggleSelectedScalarField = useCallback((e: ChangeEvent) => {
+        fieldToggler(e.target.value as string, 'scalar')
+    }, [fieldToggler])
+
+    const handleToggleSelectedVectorField = useCallback((e: ChangeEvent) => {
+        fieldToggler(e.target.value as string, 'vector')
+    }, [fieldToggler])
+
     return (
         <div key="surfaces">
             <h3>Surfaces</h3>
+            {
+                selection.synchronizeSurfaceFieldSelection && <SynchronizedFieldSelectionControls
+                    scalarFields={allFieldNames.scalarFields}
+                    vectorFields={allFieldNames.vectorFields}
+                    selectedScalarField={sharedSelectedScalarFieldName}
+                    selectedVectorField={sharedSelectedVectorFieldName}
+                    selectScalarFieldsCallback={handleToggleSelectedScalarField}
+                    selectVectorFieldsCallback={handleToggleSelectedVectorField}
+                />
+            }
             {
                 surfaces.map(surface => (
                     <PerSurfaceControls
                         name={surface.name}
                         displayed={surface.displayed}
+                        synchronized={selection.synchronizeSurfaceFieldSelection}
                         scalarFields={surface.scalarFields}
                         vectorFields={surface.vectorFields}
                         selectedScalarFieldName={surface.selectedScalarFieldName}
@@ -106,7 +145,7 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
 }
 
 const PerSurfaceControls: FunctionComponent<PerSurfaceControlsProps> = (surface: PerSurfaceControlsProps) => {
-    const { name, displayed, scalarFields, vectorFields, selectedScalarFieldName, selectedVectorFieldName, visibilityCallback, selectedVectorFieldCallback, selectedScalarFieldCallback } = surface
+    const { name, displayed, synchronized, scalarFields, vectorFields, selectedScalarFieldName, selectedVectorFieldName, visibilityCallback, selectedVectorFieldCallback, selectedScalarFieldCallback } = surface
     return (
         <div key={name}>
             <h3 key="surface">Surface: {name}</h3>
@@ -118,17 +157,17 @@ const PerSurfaceControls: FunctionComponent<PerSurfaceControlsProps> = (surface:
                 /> show surface
             </div>
             {/* Vector field selector */}
-            {displayed && <FieldSelector
+            {displayed && !synchronized && <FieldSelector
                 surfaceName={name}
-                fields={vectorFields}
+                fieldNames={vectorFields.map(vf => vf.name)}
                 selectedFieldName={selectedVectorFieldName}
                 type={'vector'}
                 callback={selectedVectorFieldCallback}
             />}
             {/* Scalar field selector */}
-            {displayed && <FieldSelector
+            {displayed && !synchronized && <FieldSelector
                 surfaceName={name}
-                fields={scalarFields}
+                fieldNames={scalarFields.map(sf => sf.name)}
                 selectedFieldName={selectedScalarFieldName}
                 type={'scalar'}
                 callback={selectedScalarFieldCallback}
@@ -138,27 +177,57 @@ const PerSurfaceControls: FunctionComponent<PerSurfaceControlsProps> = (surface:
 }
 
 const FieldSelector: FunctionComponent<FieldSelectorProps> = (props: FieldSelectorProps) => {
-    const { surfaceName, fields, selectedFieldName, type, callback } = props
-    if (fields.length === 0) return (<span />)
+    const { surfaceName, fieldNames, selectedFieldName, type, callback } = props
+    if (fieldNames.length === 0) return (<React.Fragment />)
     return (
         <div key={`surface-${type}-fields`}>
             <span>
                 <h4>Surface {type} fields</h4>
-                {
-                    fields.map(field => (
-                        <div key={field.name}>
-                            <Checkbox
-                                value={`${surfaceName}${separator}${field.name}`}
-                                checked={selectedFieldName === field.name}
-                                onChange={callback}
-                            />
-                            {field.name}
-                        </div>
-                    ))
-                }
             </span>
+            {
+                fieldNames.map(name => (
+                    <div key={name}>
+                        <Checkbox
+                            value={`${surfaceName}${separator}${name}`}
+                            checked={selectedFieldName === name}
+                            onChange={callback}
+                        />
+                        {name}
+                    </div>
+                ))
+            }
         </div>
     )
 }
+
+const SynchronizedFieldSelectionControls: FunctionComponent<SynchronizedFieldSelectionProps> = (props: SynchronizedFieldSelectionProps) => {
+    const { scalarFields, vectorFields, selectedScalarField, selectedVectorField, selectScalarFieldsCallback, selectVectorFieldsCallback } = props
+    if (scalarFields.size === 0 && vectorFields.size === 0) return <React.Fragment />
+
+    return (
+        <div key={'field-selection'}>
+            {
+                vectorFields.size > 0 && <FieldSelector
+                    surfaceName='' // an empty surface name means to apply the selection to all surfaces
+                    fieldNames={Array.from(vectorFields)}
+                    selectedFieldName={selectedVectorField}
+                    type={'vector'}
+                    callback={selectVectorFieldsCallback}
+                />
+            }
+            {
+                scalarFields.size > 0 && <FieldSelector
+                    surfaceName=''
+                    fieldNames={Array.from(scalarFields)}
+                    selectedFieldName={selectedScalarField}
+                    type={'scalar'}
+                    callback={selectScalarFieldsCallback}
+                />
+            }
+        </div>
+    )
+}
+
+
 
 export default SurfaceSelectionControls
