@@ -102,11 +102,11 @@ export type WorkspaceViewSelectionAction = {
     panelLayoutMode: PanelLayoutMode
 } | {
     type: 'toggleSelectedSurfaceScalarField'
-    surfaceScalarFieldName: string
+    surfaceFieldName: string
     surfaceName: string
 } | {
     type: 'toggleSelectedSurfaceVectorField'
-    surfaceVectorFieldName: string
+    surfaceFieldName: string
     surfaceName: string
 }
 
@@ -159,22 +159,22 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     else if (a.type === 'toggleSelectedSurfaceScalarField') {
         const name = s.selectedSurfaceScalarFieldNames[a.surfaceName]
         const X = {...s.selectedSurfaceScalarFieldNames}
-        if ((name) && (name === a.surfaceScalarFieldName)) {
+        if ((name) && (name === a.surfaceFieldName)) {
             X[a.surfaceName] = undefined
         }
         else {
-            X[a.surfaceName] = a.surfaceScalarFieldName
+            X[a.surfaceName] = a.surfaceFieldName
         }
         return {...s, selectedSurfaceScalarFieldNames: X}
     }
     else if (a.type === 'toggleSelectedSurfaceVectorField') {
         const name = s.selectedSurfaceVectorFieldNames[a.surfaceName]
         const X = {...s.selectedSurfaceVectorFieldNames}
-        if ((name) && (name === a.surfaceVectorFieldName)) {
+        if ((name) && (name === a.surfaceFieldName)) {
             X[a.surfaceName] = undefined
         }
         else {
-            X[a.surfaceName] = a.surfaceVectorFieldName
+            X[a.surfaceName] = a.surfaceFieldName
         }
         return {...s, selectedSurfaceVectorFieldNames: X}
     }
