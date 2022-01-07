@@ -31,15 +31,18 @@ const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = fa
     // The key light should be the brightest light source.
     // Adding these to the camera ensures they'll always be relative to the camera position and
     // use its coordinate system.
-    const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
-    const keyLight = new THREE.SpotLight(colors[0], .5)
-    const fillLight = new THREE.DirectionalLight(colors[1], .4)
-    const rimLight = new THREE.DirectionalLight(colors[2], .3)
-    ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
-    keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
-    fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
-    rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
-    rimLight.target = camera
+    // const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
+    // const keyLight = new THREE.SpotLight(colors[0], .5)
+    // const fillLight = new THREE.DirectionalLight(colors[1], .4)
+    // const rimLight = new THREE.DirectionalLight(colors[2], .3)
+    // ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
+    // keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
+    // fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
+    // rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
+    // rimLight.target = camera
+
+    const pointLight = new THREE.PointLight(0xffffff, 0.7)
+    camera.add(pointLight)
 }
 
 const planeMesh = (p0: [number, number, number], v1: [number, number, number], v2: [number, number, number], normal: [number, number, number], color: string, opts: {transparent: boolean, opacity: number}) => {
@@ -175,7 +178,7 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         if (grid) {
             const p0 = [grid.x0, grid.y0, grid.z0]
             const p1 = [grid.x0 + grid.dx * grid.Ny, grid.y0 + grid.dy * grid.Ny, grid.z0 + grid.dz * grid.Nz]
-            return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]))
+            return new THREE.Box3(new THREE.Vector3(p0[0], p0[1], p0[2]), new THREE.Vector3(p1[0], p1[1], p1[2]))
         }
         else {
             return getBoundingBoxForSurfaces(surfacesData.map(x => (x.surface)))
@@ -247,7 +250,7 @@ const getBoundingBoxForSurfaces = (surfaces: WorkspaceSurface[]) => {
 
     const vmin = [min(mins.map(a => a[0])), min(mins.map(a => a[1])), min(mins.map(a => a[2]))]
     const vmax = [max(maxs.map(a => a[0])), max(maxs.map(a => a[1])), max(maxs.map(a => a[2]))]
-    return new THREE.Box3(new THREE.Vector3(vmin[0], vmin[1], vmin[2]), new THREE.Vector3(vmax[0] - vmin[0], vmax[1] - vmin[1], vmax[2] - vmin[2]))
+    return new THREE.Box3(new THREE.Vector3(vmin[0], vmin[1], vmin[2]), new THREE.Vector3(vmax[0], vmax[1], vmax[2]))
 }
 
 const min = (a: number[]) => {
