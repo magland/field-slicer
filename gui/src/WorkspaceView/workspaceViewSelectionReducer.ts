@@ -161,7 +161,6 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
         return {...s, panelLayoutMode: a.panelLayoutMode}
     }
     else if (a.type === 'toggleSelectedSurfaceScalarField') {
-        // TODO: make behavior depend on state of synchronizeSurfaceFieldSelection variable rather than input surface name?
         const updatedSelections = updateFieldSelection(s.selectedSurfaceScalarFieldNames, a.surfaceFieldName, a.surfaceNames)
         return {...s, selectedSurfaceScalarFieldNames: updatedSelections}
     }
