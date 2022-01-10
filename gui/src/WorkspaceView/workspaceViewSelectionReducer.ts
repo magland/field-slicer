@@ -168,8 +168,16 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     else if (a.type === 'toggleSelectedSurfaceVectorField') {
         const updatedSelections = updateFieldSelection(s.selectedSurfaceVectorFieldNames, a.surfaceFieldName, a.surfaceNames)
         return {...s, selectedSurfaceVectorFieldNames: updatedSelections}
-    } else if (a.type === 'toggleSurfaceSelectionSynchronization') { 
-        return {...s, synchronizeSurfaceFieldSelection: !s.synchronizeSurfaceFieldSelection}
+    } else if (a.type === 'toggleSurfaceSelectionSynchronization') {
+        // If moving from a synchronized state, keep all existing selections.
+        if (s.synchronizeSurfaceFieldSelection) return {...s, synchronizeSurfaceFieldSelection: false}
+
+        // If moving *to* a synchronized state, clear any existing selections that are not synchronized.
+        const selectedScalarFields = Object.values(s.selectedSurfaceScalarFieldNames)
+        const scalarSelections = selectedScalarFields.every((f) => f === selectedScalarFields[0]) ? s.selectedSurfaceScalarFieldNames : {}
+        const selectedVectorFields = Object.values(s.selectedSurfaceVectorFieldNames)
+        const vectorSelections = selectedVectorFields.every(f => f === selectedVectorFields[0]) ? s.selectedSurfaceVectorFieldNames : {}
+        return {...s, selectedSurfaceScalarFieldNames: scalarSelections, selectedSurfaceVectorFieldNames: vectorSelections, synchronizeSurfaceFieldSelection: true}
     }
     else {
         throw Error('Unexpected action type')
@@ -181,7 +189,6 @@ const updateFieldSelection = (selections: {[surface: string]: string | undefined
 
     const newSelections: { [key: string]: string | undefined } = {...selections}
     surfacesToUpdate.forEach(surfaceName => {
-        console.log(`Updating ${surfaceName} to ${newSelectionName}`)
         const currentSelection = selections[surfaceName]
         newSelections[surfaceName] = currentSelection === newSelectionName ? undefined : newSelectionName
     })

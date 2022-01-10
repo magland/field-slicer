@@ -1,7 +1,9 @@
-import { Checkbox } from '@material-ui/core';
+import { Checkbox, FormControlLabel, FormGroup, Typography } from '@material-ui/core';
+import Switch from '@material-ui/core/Switch';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { WorkspaceSurfaceScalarField, WorkspaceSurfaceVectorField, WorkspaceViewData } from 'VolumeViewData';
 import { WorkspaceViewSelection, WorkspaceViewSelectionAction } from '../workspaceViewSelectionReducer';
+import "./Controls.css";
 
 const separator = '::'
 
@@ -9,6 +11,11 @@ type SurfaceSelectionControlProps = {
     data: WorkspaceViewData
     selection: WorkspaceViewSelection
     selectionDispatch: (a: WorkspaceViewSelectionAction) => void
+}
+
+type SyncSwitchProps = {
+    syncOn: boolean
+    callback: any
 }
 
 type PerSurfaceControlsProps = {
@@ -93,6 +100,8 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
         })
     }, [selectionDispatch])
 
+    const handleToggleSurfaceSelectionSync = useCallback(() => {selectionDispatch({type: 'toggleSurfaceSelectionSynchronization'})}, [selectionDispatch])
+
     const fieldToggler = useCallback((name: string, fieldType: 'scalar' | 'vector') => {
         const type = fieldType === 'scalar' ? 'toggleSelectedSurfaceScalarField' : 'toggleSelectedSurfaceVectorField'
         // The reducer doesn't actually know the names of non-displayed surfaces--it doesn't see the data.
@@ -114,6 +123,7 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
     return (
         <div key="surfaces">
             <h3>Surfaces</h3>
+            <SyncSwitch syncOn={selection.synchronizeSurfaceFieldSelection} callback={handleToggleSurfaceSelectionSync} />
             {
                 selection.synchronizeSurfaceFieldSelection && <SynchronizedFieldSelectionControls
                     scalarFields={allFieldNames.scalarFields}
@@ -141,6 +151,18 @@ const SurfaceSelectionControls: FunctionComponent<SurfaceSelectionControlProps> 
                 ))
             }
         </div>
+    )
+}
+
+const SyncSwitch: FunctionComponent<SyncSwitchProps> = (props: SyncSwitchProps) => {
+    const { syncOn, callback } = props
+    return (
+        <FormGroup className={"slider"}>
+            <FormControlLabel
+                control={ <Switch checked={syncOn} size={"small"} onChange={() => callback()} /> }
+                label={ <Typography variant="caption">Sync selected fields</Typography> }
+            />
+        </FormGroup>
     )
 }
 
