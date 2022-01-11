@@ -35,6 +35,7 @@ export type WorkspaceViewSelection = {
     visibleSurfaceNames?: string[]
     selectedSurfaceScalarFieldNames: {[key: string]: string | undefined}
     selectedSurfaceVectorFieldNames: {[key: string]: string | undefined}
+    synchronizeSurfaceFieldSelection: boolean
     scene3DOpts: Scene3DOpts
     planeViewOpts: PlaneViewOpts
     panelLayoutMode: PanelLayoutMode
@@ -55,6 +56,7 @@ export const defaultWorkspaceViewSelection: WorkspaceViewSelection = {
     },
     selectedSurfaceScalarFieldNames: {},
     selectedSurfaceVectorFieldNames: {},
+    synchronizeSurfaceFieldSelection: true,
     panelLayoutMode: '4-panel'
 }
 
@@ -103,11 +105,13 @@ export type WorkspaceViewSelectionAction = {
 } | {
     type: 'toggleSelectedSurfaceScalarField'
     surfaceFieldName: string
-    surfaceName: string
+    surfaceNames: string[]
 } | {
     type: 'toggleSelectedSurfaceVectorField'
     surfaceFieldName: string
-    surfaceName: string
+    surfaceNames: string[]
+} | {
+    type: 'toggleSurfaceSelectionSynchronization'
 }
 
 export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: WorkspaceViewSelectionAction): WorkspaceViewSelection => {
@@ -157,30 +161,38 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
         return {...s, panelLayoutMode: a.panelLayoutMode}
     }
     else if (a.type === 'toggleSelectedSurfaceScalarField') {
-        const name = s.selectedSurfaceScalarFieldNames[a.surfaceName]
-        const X = {...s.selectedSurfaceScalarFieldNames}
-        if ((name) && (name === a.surfaceFieldName)) {
-            X[a.surfaceName] = undefined
-        }
-        else {
-            X[a.surfaceName] = a.surfaceFieldName
-        }
-        return {...s, selectedSurfaceScalarFieldNames: X}
+        const updatedSelections = updateFieldSelection(s.selectedSurfaceScalarFieldNames, a.surfaceFieldName, a.surfaceNames)
+        return {...s, selectedSurfaceScalarFieldNames: updatedSelections}
     }
     else if (a.type === 'toggleSelectedSurfaceVectorField') {
-        const name = s.selectedSurfaceVectorFieldNames[a.surfaceName]
-        const X = {...s.selectedSurfaceVectorFieldNames}
-        if ((name) && (name === a.surfaceFieldName)) {
-            X[a.surfaceName] = undefined
-        }
-        else {
-            X[a.surfaceName] = a.surfaceFieldName
-        }
-        return {...s, selectedSurfaceVectorFieldNames: X}
+        const updatedSelections = updateFieldSelection(s.selectedSurfaceVectorFieldNames, a.surfaceFieldName, a.surfaceNames)
+        return {...s, selectedSurfaceVectorFieldNames: updatedSelections}
+    } else if (a.type === 'toggleSurfaceSelectionSynchronization') {
+        // If moving from a synchronized state, keep all existing selections.
+        if (s.synchronizeSurfaceFieldSelection) return {...s, synchronizeSurfaceFieldSelection: false}
+
+        // If moving *to* a synchronized state, clear any existing selections that are not synchronized.
+        const selectedScalarFields = Object.values(s.selectedSurfaceScalarFieldNames)
+        const scalarSelections = selectedScalarFields.every((f) => f === selectedScalarFields[0]) ? s.selectedSurfaceScalarFieldNames : {}
+        const selectedVectorFields = Object.values(s.selectedSurfaceVectorFieldNames)
+        const vectorSelections = selectedVectorFields.every(f => f === selectedVectorFields[0]) ? s.selectedSurfaceVectorFieldNames : {}
+        return {...s, selectedSurfaceScalarFieldNames: scalarSelections, selectedSurfaceVectorFieldNames: vectorSelections, synchronizeSurfaceFieldSelection: true}
     }
     else {
         throw Error('Unexpected action type')
     }
+}
+
+const updateFieldSelection = (selections: {[surface: string]: string | undefined}, newSelectionName: string, surfacesToUpdate: string[]) => {
+    if (!surfacesToUpdate) return selections
+
+    const newSelections: { [key: string]: string | undefined } = {...selections}
+    surfacesToUpdate.forEach(surfaceName => {
+        const currentSelection = selections[surfaceName]
+        newSelections[surfaceName] = currentSelection === newSelectionName ? undefined : newSelectionName
+    })
+
+    return newSelections
 }
 
 const doZoom = (zoomFactor: number, direction: number) => {
