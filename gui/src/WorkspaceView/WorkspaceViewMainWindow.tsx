@@ -13,12 +13,12 @@ type Props = {
     height: number
 }
 
-const findGridScalarFieldByName = (data: WorkspaceViewData, name: string) => {
-    return data.gridScalarFields.filter(x => (x.name === name))[0]
+const findGridScalarFieldByName = (data: WorkspaceViewData, name: string, gridName: string) => {
+    return data.gridScalarFields.filter(x => (x.name === name) && (x.gridName === gridName))[0]
 }
 
-const findGridVectorFieldByName = (data: WorkspaceViewData, name: string) => {
-    return data.gridVectorFields.filter(x => (x.name === name))[0]
+const findGridVectorFieldByName = (data: WorkspaceViewData, name: string, gridName: string) => {
+    return data.gridVectorFields.filter(x => (x.name === name) && (x.gridName === gridName))[0]
 }
 
 const extractGridVectorFieldComponent = (data: number[][][][], componentName: VectorFieldComponentName) => {
@@ -52,15 +52,16 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
     const scalarData = useMemo(() => {
         const gs = selection.gridScalar
         if (!gs) return undefined
+        if (!selection.gridName) return
         if (gs.type === 'scalarField') {
-            return findGridScalarFieldByName(data, gs.gridScalarFieldName)?.data
+            return findGridScalarFieldByName(data, gs.gridScalarFieldName, selection.gridName)?.data
         }
         else if (gs.type === 'vectorFieldComponent') {
-            const X = findGridVectorFieldByName(data, gs.gridVectorFieldName)?.data
+            const X = findGridVectorFieldByName(data, gs.gridVectorFieldName, selection.gridName)?.data
             if (!X) return undefined
             return extractGridVectorFieldComponent(X, gs.componentName)
         }
-    }, [data, selection.gridScalar])
+    }, [data, selection.gridScalar, selection.gridName])
     const {vMin, vMax} = useMemo(() => {
         if (!scalarData) return {vMin: 0, vMax: 1}
         const Nx = scalarData.length
@@ -81,8 +82,7 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
     const scalarDataRange: [number, number] = useMemo(() => ([vMin, vMax]), [vMin, vMax])
 
     const {svMin, svMax} = useMemo(() => {
-        const names = Object.values(selection.selectedSurfaceScalarFieldNames).filter(a => (a !== undefined)).map(a => (a as string))
-        const scalarFields = names.map(name => (data.surfaceScalarFields.filter(x => (x.name === name))[0]))
+        const scalarFields = data.surfaceScalarFields.filter(x => (selection.selectedSurfaceScalarFieldNames[x.surfaceName]?.includes(x.name)))
         if (scalarFields.length === 0) return {svMin: 0, svMax: 1}
         let svMin = scalarFields[0].data[0]
         let svMax = scalarFields[0].data[0]
@@ -99,8 +99,9 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
     const arrowData = useMemo(() => {
         const name = selection.gridArrowVectorFieldName
         if (!name) return undefined
-        return findGridVectorFieldByName(data, name)?.data
-    }, [data, selection.gridArrowVectorFieldName])
+        if (!selection.gridName) return undefined
+        return findGridVectorFieldByName(data, name, selection.gridName)?.data
+    }, [data, selection.gridArrowVectorFieldName, selection.gridName])
     const {aMax} = useMemo(() => {
         if (!arrowData) return {aMax: 1}
         const Nx = arrowData[0].length
@@ -138,9 +139,9 @@ const WorkspaceViewMainWindow: FunctionComponent<Props> = ({data, selection, sel
         const visibleSurfaces = data.surfaces.filter(s => ((selection.visibleSurfaceNames || []).includes(s.name)))
         return visibleSurfaces.map(S => {
             const scalarFieldName = selection.selectedSurfaceScalarFieldNames[S.name]
-            const scalarField = scalarFieldName ? data.surfaceScalarFields.filter(x => (x.name === scalarFieldName))[0] : undefined
+            const scalarField = scalarFieldName ? data.surfaceScalarFields.filter(x => (x.name === scalarFieldName) && (x.surfaceName === S.name))[0] : undefined
             const vectorFieldName = selection.selectedSurfaceVectorFieldNames[S.name]
-            const vectorField = vectorFieldName ? data.surfaceVectorFields.filter(x => (x.name === vectorFieldName))[0] : undefined
+            const vectorField = vectorFieldName ? data.surfaceVectorFields.filter(x => (x.name === vectorFieldName) && (x.surfaceName === S.name))[0] : undefined
             return {
                 surface: S,
                 scalarField,
