@@ -22,28 +22,25 @@ type Props = {
     height: number
 }
 
-const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false, extentX: number, extentY: number, extentZ: number) => {
-    // A traditional three-light setup has the main shadow-generating light, or key light,
-    // slightly above the camera and at an angle ~30-45 degrees to the subject;
-    // the fill light comes from the other side and is softer and is trying to ensure shadows aren't
-    // too dramatic;
-    // then a rim light opposite the camera provides additional highlights to the object edges.
-    // The key light should be the brightest light source.
-    // Adding these to the camera ensures they'll always be relative to the camera position and
-    // use its coordinate system.
-    // const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
-    // const keyLight = new THREE.SpotLight(colors[0], .5)
-    // const fillLight = new THREE.DirectionalLight(colors[1], .4)
-    // const rimLight = new THREE.DirectionalLight(colors[2], .3)
-    // ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
-    // keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
-    // fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
-    // rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
-    // rimLight.target = camera
-
-    const pointLight = new THREE.PointLight(0xffffff, 0.7)
-    camera.add(pointLight)
-}
+// const addThreePointLights = (camera: THREE.PerspectiveCamera, test: boolean = false, extentX: number, extentY: number, extentZ: number) => {
+//     // A traditional three-light setup has the main shadow-generating light, or key light,
+//     // slightly above the camera and at an angle ~30-45 degrees to the subject;
+//     // the fill light comes from the other side and is softer and is trying to ensure shadows aren't
+//     // too dramatic;
+//     // then a rim light opposite the camera provides additional highlights to the object edges.
+//     // The key light should be the brightest light source.
+//     // Adding these to the camera ensures they'll always be relative to the camera position and
+//     // use its coordinate system.
+//     const colors = test ? [0xff0000, 0x0000ff, 0x00ff00] : [0xffffff, 0xffffff, 0xffffff]
+//     const keyLight = new THREE.SpotLight(colors[0], .5)
+//     const fillLight = new THREE.DirectionalLight(colors[1], .4)
+//     const rimLight = new THREE.DirectionalLight(colors[2], .3)
+//     ;[keyLight, fillLight, rimLight].forEach(l => camera.add(l))
+//     keyLight.position.set(1.5 * extentX, 0.5 * extentY, 0)
+//     fillLight.position.set(-1.5 * extentX, 0.5 * extentY, 0)
+//     rimLight.position.set(0, 0.2 * extentY, -1 * extentZ)
+//     rimLight.target = camera
+// }
 
 const planeMesh = (p0: [number, number, number], v1: [number, number, number], v2: [number, number, number], normal: [number, number, number], color: string, opts: {transparent: boolean, opacity: number}) => {
     const material = new THREE.MeshBasicMaterial( {
@@ -185,19 +182,35 @@ const Scene3DPanelView: FunctionComponent<Props> = ({grid, focusPosition, surfac
         }
     }, [grid, surfacesData])
 
-    const {camera, controls} = useMemo(() => {
-        if (!container) return {camera: undefined, controls: undefined}
-        const p = {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
+    const camera = useMemo(() => {
+        if (!container) return undefined
         const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 100000 )
-        camera.position.set(p.x, p.y, p.z + (bbox.max.z - bbox.min.z) * 3)
+        const pointLight = new THREE.PointLight(0xffffff, 0.7)
+        camera.add(pointLight)
+        return camera
+    }, [container, width, height])
+
+    const controls = useMemo(() => {
+        if (!container) return undefined
+        if (!camera) return undefined
         const controls = new OrbitControls( camera, container )
-        controls.target.set(p.x, p.y, p.z)
-        addThreePointLights(camera, false, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z)
-        return {
-            camera,
-            controls
-        }
-    }, [width, height, bbox, container])
+        return controls
+    }, [camera, container])
+
+    const center = useMemo(() => {
+        return {x: (bbox.min.x + bbox.max.x) / 2, y: (bbox.min.y + bbox.max.y) / 2, z: (bbox.min.z + bbox.max.z) / 2}
+    }, [bbox])
+
+    const zSpan = useMemo(() => {
+        return bbox.max.z - bbox.min.z
+    }, [bbox])
+
+    useEffect(() => {
+        if (!camera) return
+        if (!controls) return
+        camera.position.set(center.x, center.y, center.z + zSpan * 3)
+        controls.target.set(center.x, center.y, center.z)
+    }, [center.x, center.y, center.z, zSpan, camera, controls]) // important to not pass in center, because reference will change whenever bbox reference changes
 
     const renderer = useMemo(() => {
         const renderer = new THREE.WebGLRenderer();
