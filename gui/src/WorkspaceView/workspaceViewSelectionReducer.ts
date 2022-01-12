@@ -91,6 +91,9 @@ export type WorkspaceViewSelectionAction = {
     type: 'planeViewZoom'
     direction: number
 } | {
+    type: 'planeViewSetZoomFactor'
+    zoomFactor: number
+} | {
     type: 'planeViewBrighten'
     direction: number
 } | {
@@ -147,6 +150,9 @@ export const workspaceViewSelectionReducer = (s: WorkspaceViewSelection, a: Work
     }
     else if (a.type === 'planeViewZoom') {
         return {...s, planeViewOpts: {...s.planeViewOpts, zoomFactor: doZoom(s.planeViewOpts.zoomFactor, a.direction)}}
+    }
+    else if (a.type === 'planeViewSetZoomFactor') {
+        return {...s, planeViewOpts: {...s.planeViewOpts, zoomFactor: adjustZoom(a.zoomFactor)}}
     }
     else if (a.type === 'planeViewBrighten') {
         return {...s, planeViewOpts: {...s.planeViewOpts, brightnessFactor: doZoom(s.planeViewOpts.brightnessFactor, a.direction)}}
@@ -205,6 +211,12 @@ const doZoom = (zoomFactor: number, direction: number) => {
         else return 1 / (Math.round(1 / zoomFactor) - 1)
     }
     else return zoomFactor
+}
+
+const adjustZoom = (zoom: number) => {
+    if (zoom > 1) return Math.floor(zoom)
+    else if (zoom < 1) return 1 / (Math.ceil(1 / zoom))
+    else return 1
 }
 
 const adjustStride = (stride: number, direction: number) => {
