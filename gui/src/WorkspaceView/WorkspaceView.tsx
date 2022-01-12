@@ -57,6 +57,15 @@ const WorkspaceView: FunctionComponent<Props> = ({data, width, height}) => {
         return data.grids.filter(x => (x.name === selection.gridName))[0]
     }, [selection.gridName, data.grids])
 
+    // set an initial zoom level when grid changes
+    useEffect(() => {
+        if (!grid) return
+        const Nmax = Math.max(grid.Nx, grid.Ny, grid.Nz)
+        const Ntarget = 600 // target of 600 pixels
+        const zoomFactor = (Nmax < Ntarget) ? Ntarget / Nmax : 1
+        selectionDispatch({type: 'planeViewSetZoomFactor', zoomFactor})
+    }, [grid])
+
     useEffect(() => {
         if (grid) {
             selectionDispatch({
