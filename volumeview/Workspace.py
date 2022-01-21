@@ -79,9 +79,9 @@ class Workspace:
             assert surface._vertices.dtype in [np.float32]
             assert surface._faces.dtype in [np.int16, np.int32]
             vertices_uri = kc.store_json(_serialize(surface._vertices))
-            kc.upload_file(vertices_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(vertices_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             faces_uri = kc.store_json(_serialize(surface._faces))
-            kc.upload_file(faces_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(faces_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['surfaces'].append({
                 'name': surface._name,
                 'vertices': vertices_uri,
@@ -90,7 +90,7 @@ class Workspace:
         for X in self._grid_vector_fields:
             assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['gridVectorFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -99,7 +99,7 @@ class Workspace:
         for X in self._grid_scalar_fields:
             assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['gridScalarFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -108,7 +108,7 @@ class Workspace:
         for X in self._grid_regions:
             assert X._data.dtype in [np.uint8]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['gridRegions'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -117,7 +117,7 @@ class Workspace:
         for X in self._surface_vector_fields:
             assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['surfaceVectorFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
@@ -126,7 +126,7 @@ class Workspace:
         for X in self._surface_scalar_fields:
             assert X._data.dtype in [np.float32]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['surfaceScalarFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
@@ -135,7 +135,7 @@ class Workspace:
         for X in self._surface_regions:
             assert X._data.dtype in [np.uint8]
             data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
             data['surfaceRegions'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,

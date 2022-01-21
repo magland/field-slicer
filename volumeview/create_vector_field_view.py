@@ -17,7 +17,7 @@ def create_vector_field_view(v: np.ndarray):
     assert nx * ny * nz <= 1e7
     assert v.dtype in [np.float32, np.int16, np.int32], f'Unsupported data type: {v.dtype}'
     data_uri = kc.store_json(_serialize(v))
-    kc.upload_file(data_uri, channel=FIGURL_CHANNEL)
+    kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
     data = {
         'type': 'vector_field',
         'dataUri': data_uri,

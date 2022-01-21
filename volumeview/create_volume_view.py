@@ -17,7 +17,7 @@ def create_volume_view(v: np.ndarray, *, component_names: List[str]):
     assert nx * ny * nz <= 1e7
     assert v.dtype in [np.float32, np.int16, np.int32], f'Unsupported data type: {v.dtype}'
     volume_uri = kc.store_json(_serialize(v))
-    kc.upload_file(volume_uri, channel=FIGURL_CHANNEL)
+    kc.upload_file(volume_uri, channel=FIGURL_CHANNEL, single_chunk=True)
     data = {
         'type': 'volume',
         'dataUri': volume_uri,
