@@ -1,13 +1,11 @@
-# 1/6/2022:
-# https://figurl.org/f?v=gs://figurl/volumeview-2&d=395f64a72cce348d9a81dad8c21bd93194a477e9&channel=flatiron1&label=Test%20grid%20scalar%20fields
+# 5/6/2022:
+# https://figurl.org/f?v=gs://figurl/volumeview-3&d=ipfs://bafkreiem7y6bactndiabma2c2nb2rtxyw5sv4xsbixgqn74pnmehxccwve&label=Test%20grid%20scalar%20fields
 
 import os
 import numpy as np
 import volumeview as vv
 
 def main():
-    assert os.getenv('FIGURL_CHANNEL'), 'Environment variable not set: FIGURL_CHANNEL'
-
     Nx = 90; Ny = 60; Nz = 45
     ix, iy, iz = np.meshgrid(*[np.linspace(-1, 1, n) for n in [Nx, Ny, Nz]], indexing='ij')
     S1 = np.exp(-3 * (ix**2 + iy**2 + iz**2))

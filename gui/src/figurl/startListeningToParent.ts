@@ -1,11 +1,10 @@
 import { handleTaskStatusUpdate } from "./initiateTask"
-import { handleNewSubfeedMessages } from "./subfeedManager"
+import { handleNewFeedMessages } from "./feedManager"
 import { FigurlResponseMessage, isMessageToChild } from "./viewInterface/MessageToChildTypes"
 import { handleFigurlResponse } from "./sendRequestToParent"
 import { handleSetCurrentUser } from "./useSignedIn"
 import { isMessageToParent } from "./viewInterface/MessageToParentTypes"
 import { GetFigureDataResponse, GetFileDataResponse } from "./viewInterface/FigurlRequestTypes"
-import { sleepMsecNum } from "./util/sleepMsec"
 
 const urlSearchParams = new URLSearchParams(window.location.search)
 const queryParams = Object.fromEntries(urlSearchParams.entries())
@@ -17,16 +16,10 @@ if (!queryParams.parentOrigin) {
     document.body.appendChild(s);
 }
 
-const waitForFigurlData = async () => {
-    while (true) {
-        if ((window as any).figurlData) return
-        await sleepMsecNum(200)
-    }
-}
-
 const startListeningToParent = () => {
     window.addEventListener('message', e => {
         const msg = e.data
+        if (!msg) return
         if (isMessageToChild(msg)) {
             if (msg.type === 'figurlResponse') {
                 handleFigurlResponse(msg)
@@ -34,8 +27,8 @@ const startListeningToParent = () => {
             else if (msg.type === 'taskStatusUpdate') {
                 handleTaskStatusUpdate(msg)
             }
-            else if (msg.type === 'newSubfeedMessages') {
-                handleNewSubfeedMessages(msg)
+            else if (msg.type === 'newFeedMessages') {
+                handleNewFeedMessages(msg)
             }
             else if (msg.type === 'setCurrentUser') {
                 handleSetCurrentUser({userId: msg.userId, googleIdToken: msg.googleIdToken})
@@ -47,46 +40,44 @@ const startListeningToParent = () => {
                 console.warn('Got message to parent even though parentOrigin is defined')
                 return
             }
-            waitForFigurlData().then(() => {
-                if (msg.type === 'figurlRequest') {
-                    const req = msg.request
-                    if (req.type === 'getFigureData') {
-                        const figureData = (window as any).figurlData.figure
-                        const resp: GetFigureDataResponse = {
-                            type: 'getFigureData',
-                            figureData
-                        }
-                        const msg2: FigurlResponseMessage = {
-                            type: 'figurlResponse',
-                            requestId: msg.requestId,
-                            response: resp
-                        }
-                        window.postMessage(msg2, '*')
+            if (msg.type === 'figurlRequest') {
+                const req = msg.request
+                if (req.type === 'getFigureData') {
+                    const figureData = (window as any).figurlData.figure
+                    const resp: GetFigureDataResponse = {
+                        type: 'getFigureData',
+                        figureData
                     }
-                    else if (req.type === 'getFileData') {
-                        const fileData = (window as any).figurlData.sha1[req.sha1.toString()]
-                        const resp: GetFileDataResponse = {
-                            type: 'getFileData',
-                            fileData
-                        }
-                        const msg2: FigurlResponseMessage = {
-                            type: 'figurlResponse',
-                            requestId: msg.requestId,
-                            response: resp
-                        }
-                        window.postMessage(msg2, '*')
+                    const msg2: FigurlResponseMessage = {
+                        type: 'figurlResponse',
+                        requestId: msg.requestId,
+                        response: resp
                     }
-                    else if (req.type === 'initiateTask') {
-                        console.warn(`Unable to handle request of type ${req.type} for self-contained figures`)
-                    }
-                    else if (req.type === 'subscribeToSubfeed') {
-                        console.warn(`Unable to handle request of type ${req.type} for self-contained figures`)
-                    }
+                    window.postMessage(msg2, '*')
                 }
-            })
+                else if (req.type === 'getFileData') {
+                    const fileData = (window as any).figurlData.uri[req.uri]
+                    const resp: GetFileDataResponse = {
+                        type: 'getFileData',
+                        fileData
+                    }
+                    const msg2: FigurlResponseMessage = {
+                        type: 'figurlResponse',
+                        requestId: msg.requestId,
+                        response: resp
+                    }
+                    window.postMessage(msg2, '*')
+                }
+                else if (req.type === 'initiateTask') {
+                    console.warn(`Unable to handle request of type ${req.type} for self-contained figures`)
+                }
+                else if (req.type === 'subscribeToFeed') {
+                    console.warn(`Unable to handle request of type ${req.type} for self-contained figures`)
+                }
+            }
         }
         else {
-            console.log('Unhandled message', e)
+            console.warn('Unhandled message from parent', e)
         }
     })
 }

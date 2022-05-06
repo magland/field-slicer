@@ -2,7 +2,6 @@ import os
 import math
 import numpy as np
 import figurl as fig
-import kachery_client as kc
 
 def create_surface_view(*,
     vertices: np.ndarray, # n x 3
@@ -21,7 +20,7 @@ def create_surface_view(*,
         'vertices': vertices,
         'faces': faces
     }
-    F = fig.Figure(view_url='gs://figurl/volumeview-2', data=data)
+    F = fig.Figure(view_url='gs://figurl/volumeview-3', data=data)
     return F
 
 def _parse_vtk_unstructured_grid(vtk_path: str):

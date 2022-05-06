@@ -1,11 +1,10 @@
-import kachery_client as kc
+import kachery_cloud as kcl
 import volumeview as vv
 import numpy as np
 
 def main():
-    # your node needs to be a member of the flatiron1 kachery channel to obtain this file
-    vtk_uri = 'sha1://e54d59b5f12d226fdfe8a0de7d66a3efd1b83d69/rbc_001.vtk'
-    vtk_path = kc.load_file(vtk_uri)
+    vtk_uri = 'ipfs://bafkreiezdffcektdjjw6uh6kyxdrtzonwhbvns5btozta5smknml4oala4?label=rbc_001.vtk'
+    vtk_path = kcl.load_file(vtk_uri)
 
     vertices, faces = vv._parse_vtk_unstructured_grid(vtk_path)
     vertices2 = np.array([[-v[0] + 10, -v[1] + 2, v[2]] for v in vertices], np.float32)
@@ -27,8 +26,8 @@ def main():
     F = W.create_figure()
     url = F.url(label='red blood cell')
     print(url)
-    # 1/6/2022
-    # https://www.figurl.org/f?v=gs://figurl/volumeview-2&d=a997d5dd425a92ee67aa750aa48a9d9c3193f474&channel=flatiron1&label=red%20blood%20cell
+    # 5/6/2022
+    # https://figurl.org/f?v=gs://figurl/volumeview-3&d=ipfs://bafkreifiln4dcb77xhjak3aqhk7awrryyvp4kpaslk7b2amx7j56lzjr2u&label=red%20blood%20cell
 
 if __name__ == '__main__':
     main()

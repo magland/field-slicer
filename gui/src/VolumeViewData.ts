@@ -1,6 +1,5 @@
 import { validateObject } from "figurl"
-import { isOneOf } from "figurl/viewInterface/kacheryTypes"
-import { isArrayOf, isEqualTo, isNumber, isString } from "figurl/viewInterface/validateObject"
+import { isArrayOf, isEqualTo, isNumber, isString, isOneOf } from "figurl/viewInterface/validateObject"
 
 export type WorkspaceGrid = {
     name: string

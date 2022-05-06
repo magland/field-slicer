@@ -1,13 +1,11 @@
-# 1/6/2022
-# https://figurl.org/f?v=gs://figurl/volumeview-2&d=e9d66edac2246a9db4aca6c515d4b79aaa450796&channel=flatiron1&label=Test%20volumeview%20workspace
+# 5/6/2022
+# https://figurl.org/f?v=gs://figurl/volumeview-3&d=ipfs://bafkreifwa43fxcsp463roznlnoaorwuxbopqkrkiheyyks56chcjmhp3r4&label=Test%20volumeview%20workspace
 
 import os
 import numpy as np
 import volumeview as vv
 
 def main():
-    assert os.getenv('FIGURL_CHANNEL'), 'Environment variable not set: FIGURL_CHANNEL'
-
     W = vv.Workspace()
 
     Nx, Ny, Nz = 90, 60, 45

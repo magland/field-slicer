@@ -1,5 +1,5 @@
-import { ErrorMessage, FeedId, isArrayOf, isErrorMessage, isFeedId, isSha1Hash, isSubfeedHash, isSubfeedMessage, isTaskFunctionId, isTaskFunctionType, isTaskId, isTaskStatus, Sha1Hash, SubfeedHash, SubfeedMessage, TaskFunctionId, TaskFunctionType, TaskId, TaskStatus } from "./kacheryTypes"
-import validateObject, { isBoolean, isEqualTo, isOneOf, optional } from "./validateObject"
+import { isTaskJobStatus, isTaskType, TaskJobStatus, TaskType } from "./MessageToChildTypes"
+import validateObject, { isArrayOf, isEqualTo, isJSONObject, isNull, isOneOf, isString, JSONObject, optional } from "./validateObject"
 
 // getFigureData
 
@@ -29,13 +29,13 @@ export const isGetFigureDataResponse = (x: any): x is GetFigureDataResponse => {
 
 export type GetFileDataRequest = {
     type: 'getFileData'
-    sha1: Sha1Hash
+    uri: string
 }
 
 export const isGetFileDataRequest = (x: any): x is GetFileDataRequest => {
     return validateObject(x, {
         type: isEqualTo('getFileData'),
-        sha1: isSha1Hash
+        uri: optional(isString)
     })
 }
 
@@ -51,71 +51,91 @@ export const isGetFileDataResponse = (x: any): x is GetFileDataResponse => {
     })
 }
 
+// getMutable
+
+export type GetMutableRequest = {
+    type: 'getMutable'
+    key: string
+}
+
+export const isGetMutableRequest = (x: any): x is GetMutableRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getMutable'),
+        key: isString
+    })
+}
+
+export type GetMutableResponse = {
+    type: 'getMutable'
+    value: string | null
+}
+
+export const isGetMutableResponse = (x: any): x is GetMutableResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getMutable'),
+        value: isOneOf([isNull, isString])
+    })
+}
+
 // initiateTask
 
 export type InitiateTaskRequest = {
     type: 'initiateTask'
-    functionId: TaskFunctionId
-    kwargs: {[key: string]: any}
-    functionType: TaskFunctionType
-    queryUseCache: boolean
-    queryFallbackToCache: boolean
+    taskName: string
+    taskInput: {[key: string]: any}
+    taskType: TaskType
 }
 
 export const isInitiateTaskRequest = (x: any): x is InitiateTaskRequest => {
     return validateObject(x, {
         type: isEqualTo('initiateTask'),
-        functionId: isTaskFunctionId,
-        kwargs: () => (true),
-        functionType: isTaskFunctionType,
-        queryUseCache: isBoolean,
-        queryFallbackToCache: isBoolean
+        taskName: isString,
+        taskInput: () => (true),
+        taskType: isTaskType
     })
 }
 
 export type InitiateTaskResponse = {
     type: 'initiateTask'
-    taskId: TaskId
-    taskStatus: TaskStatus
-    errorMessage?: ErrorMessage // for status=error
+    taskJobId: string
+    status: TaskJobStatus
+    errorMessage?: string // for status=error
     returnValue?: any // for status=finished
 }
 
 export const isInitiateTaskResponse = (x: any): x is InitiateTaskResponse => {
     return validateObject(x, {
         type: isEqualTo('initiateTask'),
-        taskId: isTaskId,
-        taskStatus: isTaskStatus,
-        errorMessage: optional(isErrorMessage),
+        taskJobId: isString,
+        status: isTaskJobStatus,
+        errorMessage: optional(isString),
         returnValue: optional(() => (true))
     })
 }
 
-// subscribeToSubfeed
+// subscribeToFeed
 
-export type SubscribeToSubfeedRequest = {
-    type: 'subscribeToSubfeed'
-    feedId: FeedId
-    subfeedHash: SubfeedHash
+export type SubscribeToFeedRequest = {
+    type: 'subscribeToFeed'
+    feedId: string
 }
 
-export const isSubscribeToSubfeedRequest = (x: any): x is SubscribeToSubfeedRequest => {
+export const isSubscribeToFeedRequest = (x: any): x is SubscribeToFeedRequest => {
     return validateObject(x, {
-        type: isEqualTo('subscribeToSubfeed'),
-        feedId: isFeedId,
-        subfeedHash: isSubfeedHash
+        type: isEqualTo('subscribeToFeed'),
+        feedId: isString
     })
 }
 
-export type SubscribeToSubfeedResponse = {
-    type: 'subscribeToSubfeed'
-    messages: SubfeedMessage[]
+export type SubscribeToFeedResponse = {
+    type: 'subscribeToFeed'
+    messages: JSONObject[]
 }
 
-export const isSubscribeToSubfeedResponse = (x: any): x is SubscribeToSubfeedResponse => {
+export const isSubscribeToFeedResponse = (x: any): x is SubscribeToFeedResponse => {
     return validateObject(x, {
-        type: isEqualTo('subscribeToSubfeed'),
-        messages: isArrayOf(isSubfeedMessage)
+        type: isEqualTo('subscribeToFeed'),
+        messages: isArrayOf(isJSONObject)
     })
 }
 
@@ -124,29 +144,33 @@ export const isSubscribeToSubfeedResponse = (x: any): x is SubscribeToSubfeedRes
 export type FigurlRequest =
     GetFigureDataRequest |
     GetFileDataRequest |
+    GetMutableRequest |
     InitiateTaskRequest |
-    SubscribeToSubfeedRequest
+    SubscribeToFeedRequest
 
 export const isFigurlRequest = (x: any): x is FigurlRequest => {
     return isOneOf([
         isGetFigureDataRequest,
         isGetFileDataRequest,
+        isGetMutableRequest,
         isInitiateTaskRequest,
-        isSubscribeToSubfeedRequest
+        isSubscribeToFeedRequest
     ])(x)
 }
 
 export type FigurlResponse =
     GetFigureDataResponse |
     GetFileDataResponse |
+    GetMutableResponse |
     InitiateTaskResponse |
-    SubscribeToSubfeedResponse
+    SubscribeToFeedResponse
 
 export const isFigurlResponse = (x: any): x is FigurlResponse => {
     return isOneOf([
         isGetFigureDataResponse,
         isGetFileDataResponse,
+        isGetMutableResponse,
         isInitiateTaskResponse,
-        isSubscribeToSubfeedResponse
+        isSubscribeToFeedResponse
     ])(x)
 }

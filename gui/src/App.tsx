@@ -44,7 +44,7 @@ function App() {
 
 const loadArrays = async (data: any): Promise<any> => {
   if (typeof(data) === 'string') {
-    if (data.startsWith('sha1://')) {
+    if (data.startsWith('ipfs://')) {
       const ret = await getFileData(data)
       return ret
     }

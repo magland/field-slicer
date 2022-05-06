@@ -4,7 +4,7 @@
 % pyenv("ExecutionMode", "OutOfProcess")
 
 % 1/28/22
-% https://figurl.org/f?v=gs://figurl/volumeview-2&d=efb1c7ea332890e9ec4ec4a633b7ddf490400a39&channel=flatiron1&label=matlab-test
+% https://figurl.org/f?v=gs://figurl/volumeview-3&d=efb1c7ea332890e9ec4ec4a633b7ddf490400a39&channel=flatiron1&label=matlab-test
 
 % define vertices and faces of a cube
 a = 30;

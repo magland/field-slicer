@@ -1,13 +1,11 @@
-# 1/6/2022
-# https://www.figurl.org/f?v=gs://figurl/volumeview-2&d=84d7c4cd4c4275f08d0285c595535cd334eed482&channel=flatiron1&label=Test%20grid%20vector%20field
+# 5/6/2022
+# https://figurl.org/f?v=gs://figurl/volumeview-3&d=ipfs://bafkreig3jprc63qh25zv6si6cjh6a35tl72hp6ipwxdou3mvqrgvt3wbhu&label=Test%20grid%20vector%20field
 
 import os
 import numpy as np
 import volumeview as vv
 
 def main():
-    assert os.getenv('FIGURL_CHANNEL'), 'Environment variable not set: FIGURL_CHANNEL'
-
     Nx = 90; Ny = 60; Nz = 45
     ix, iy, iz = np.meshgrid(*[np.linspace(-1, 1, n) for n in [Nx, Ny, Nz]], indexing='ij')
     a = np.zeros((3, Nx, Ny, Nz), dtype=np.float32)

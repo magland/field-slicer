@@ -1,7 +1,7 @@
 from typing import List
 import os
 import numpy as np
-import kachery_client as kc
+import kachery_cloud as kcl
 import figurl as fig
 from figurl.core.serialize_wrapper import _serialize
 
@@ -49,8 +49,6 @@ class Workspace:
         self._surface_regions.append(X)
         return X
     def create_figure(self):
-        FIGURL_CHANNEL = os.getenv('FIGURL_CHANNEL')
-        assert FIGURL_CHANNEL, 'Environment variable not set: FIGURL_CHANNEL'
         data = {
             'type': 'workspace',
             'grids': [],
@@ -78,10 +76,8 @@ class Workspace:
         for surface in self._surfaces:
             assert surface._vertices.dtype in [np.float32]
             assert surface._faces.dtype in [np.int16, np.int32]
-            vertices_uri = kc.store_json(_serialize(surface._vertices))
-            kc.upload_file(vertices_uri, channel=FIGURL_CHANNEL, single_chunk=True)
-            faces_uri = kc.store_json(_serialize(surface._faces))
-            kc.upload_file(faces_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            vertices_uri = kcl.store_json(_serialize(surface._vertices))
+            faces_uri = kcl.store_json(_serialize(surface._faces))
             data['surfaces'].append({
                 'name': surface._name,
                 'vertices': vertices_uri,
@@ -89,8 +85,7 @@ class Workspace:
             })
         for X in self._grid_vector_fields:
             assert X._data.dtype in [np.float32]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['gridVectorFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -98,8 +93,7 @@ class Workspace:
             })
         for X in self._grid_scalar_fields:
             assert X._data.dtype in [np.float32]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['gridScalarFields'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -107,8 +101,7 @@ class Workspace:
             })
         for X in self._grid_regions:
             assert X._data.dtype in [np.uint8]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['gridRegions'].append({
                 'name': X._name,
                 'gridName': X._grid._name,
@@ -116,8 +109,7 @@ class Workspace:
             })
         for X in self._surface_vector_fields:
             assert X._data.dtype in [np.float32]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['surfaceVectorFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
@@ -125,8 +117,7 @@ class Workspace:
             })
         for X in self._surface_scalar_fields:
             assert X._data.dtype in [np.float32]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['surfaceScalarFields'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
@@ -134,14 +125,13 @@ class Workspace:
             })
         for X in self._surface_regions:
             assert X._data.dtype in [np.uint8]
-            data_uri = kc.store_json(_serialize(X._data))
-            kc.upload_file(data_uri, channel=FIGURL_CHANNEL, single_chunk=True)
+            data_uri = kcl.store_json(_serialize(X._data))
             data['surfaceRegions'].append({
                 'name': X._name,
                 'surfaceName': X._surface._name,
                 'data': data_uri
             })
-        F = fig.Figure(view_url='gs://figurl/volumeview-2', data=data)
+        F = fig.Figure(view_url='gs://figurl/volumeview-3', data=data)
         return F
 
 class WorkspaceGrid:
