@@ -4,34 +4,34 @@
   "private": true,
   "homepage": "./",
   "dependencies": {
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "mathjs": "^10.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@figurl/interface": "^0.1",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.7",
+    "@types/node": "^16.11.59",
+    "@types/react": "^18.0.20",
+    "@types/react-dom": "^18.0.6",
+    "mathjs": "^11.11.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-draggable": "^4.4.4",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
+    "scale-color-perceptual": "^1.1.2",
     "three": "^0.134.0",
-    "typescript": "^4.1.2",
-    "web-vitals": "^1.0.1"
+    "typescript": "^4.8.3"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -47,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/mathjs": "^9.4.2",
     "@types/three": "^0.134.0"
   }
 }

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement, useState } from 'react';
+import React, { FunctionComponent, PropsWithChildren, ReactElement, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 interface Props {
@@ -17,7 +17,7 @@ const defaultGripThickness = 10
 const defaultGripInnerThickness = 4
 const defaultGripMargin = 2
 
-const Splitter: FunctionComponent<Props & {ref?: React.Ref<HTMLDivElement>}> = React.forwardRef((props, ref) => {
+const Splitter: FunctionComponent<PropsWithChildren<Props> & {ref?: React.Ref<HTMLDivElement>}> = React.forwardRef((props, ref) => {
     const {width, height, initialPosition, onChange, adjustable=true, positionFromRight=false} = props
 
     const [gripPosition, setGripPosition] = useState<number>(initialPosition)

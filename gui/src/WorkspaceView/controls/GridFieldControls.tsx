@@ -1,8 +1,8 @@
 import { Checkbox, Radio } from '@material-ui/core';
-import { JSONStringifyDeterministic } from 'figurl/viewInterface/kacheryTypes';
 import React, { Fragment, FunctionComponent, useCallback } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
 import { GridScalarValue, VectorFieldComponentName, vectorFieldComponentNames, WorkspaceViewSelection, WorkspaceViewSelectionAction } from '../workspaceViewSelectionReducer';
+import JSONStringifyDeterministic from './jsonStringifyDeterministic';
 
 type GridFieldSelectionControlsProps = {
     data: WorkspaceViewData

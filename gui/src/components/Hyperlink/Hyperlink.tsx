@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, PropsWithChildren } from 'react';
 
 type Props = {
     onClick?: () => void
@@ -8,7 +8,7 @@ type Props = {
     title?: string
 }
 
-const Hyperlink: FunctionComponent<Props> = ({ style={}, onClick, href, target, title, children }) => {
+const Hyperlink: FunctionComponent<PropsWithChildren<Props>> = ({ style={}, onClick, href, target, title, children }) => {
     let style0: React.CSSProperties = {
         color: 'gray',
         cursor: 'pointer',

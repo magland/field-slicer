@@ -1,10 +1,13 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/ban-types */
 export type ValidateObjectSpec = {[key: string]: ValidateObjectSpec | (Function & ((a: any) => any))}
 
 export type JSONPrimitive = string | number | boolean | null;
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 export type JSONObject = { [member: string]: JSONValue };
 export interface JSONArray extends Array<JSONValue> {}
-
 
 // string
 export const isString = (x: any): x is string => {
@@ -95,6 +98,7 @@ export const isObjectOf = (keyTestFunction: (x: any) => boolean, valueTestFuncti
     }
 }
 
+
 export const isJSONObject = (x: any): x is JSONObject => {
     if (!isObject(x)) return false
     return isJSONSerializable(x)
@@ -146,6 +150,7 @@ export const isJSONSerializable = (obj: any): boolean => {
 
 const validateObject = (x: any, spec: ValidateObjectSpec, opts?: {callback?: (x: string) => any, allowAdditionalFields?: boolean}): boolean => {
     const o = opts || {}
+    // o.callback = o.callback || (x => {console.warn(x)})
     if (!x) {
         o.callback && o.callback('x is undefined/null.')
         return false;
@@ -166,7 +171,7 @@ const validateObject = (x: any, spec: ValidateObjectSpec, opts?: {callback?: (x:
         const specK = spec[k];
         if (isFunction(specK)) {
             if (!specK(x[k])) {
-                o.callback && o.callback(`Problem validating: ${k}`)
+                o.callback && o.callback(`Problem validating: ${k} (${x[k]})`)
                 return false;
             }
         }

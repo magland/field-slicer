@@ -1,4 +1,4 @@
-import Splitter from 'components/Splitter/Splitter';
+import Splitter from '../components/Splitter/Splitter';
 import React, { FunctionComponent, useEffect, useMemo, useReducer } from 'react';
 import { WorkspaceViewData } from 'VolumeViewData';
 import WorkspaceViewControlPanel from './WorkspaceViewControlPanel';

@@ -1,5 +1,4 @@
-import { validateObject } from "figurl"
-import { isArrayOf, isEqualTo, isNumber, isString, isOneOf } from "figurl/viewInterface/validateObject"
+import validateObject, { isArrayOf, isEqualTo, isNumber, isString, isOneOf } from "./validateObject"
 
 export type WorkspaceGrid = {
     name: string

@@ -1,4 +1,4 @@
-import Hyperlink from 'components/Hyperlink/Hyperlink';
+import Hyperlink from '../../components/Hyperlink/Hyperlink';
 import React, { FunctionComponent } from 'react';
 
 type Props = {

@@ -76,12 +76,12 @@ class Workspace:
         for surface in self._surfaces:
             assert surface._vertices.dtype in [np.float32]
             assert surface._faces.dtype in [np.int16, np.int32]
-            vertices_uri = kcl.store_json(_serialize(surface._vertices))
-            faces_uri = kcl.store_json(_serialize(surface._faces))
+            # vertices_uri = kcl.store_json(_serialize(surface._vertices))
+            # faces_uri = kcl.store_json(_serialize(surface._faces))
             data['surfaces'].append({
                 'name': surface._name,
-                'vertices': vertices_uri,
-                'faces': faces_uri
+                'vertices': _serialize(surface._vertices),
+                'faces': _serialize(surface._faces)
             })
         for X in self._grid_vector_fields:
             assert X._data.dtype in [np.float32]
