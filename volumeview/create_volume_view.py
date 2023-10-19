@@ -21,5 +21,5 @@ def create_volume_view(v: np.ndarray, *, component_names: List[str]):
         'dataShape': v.shape,
         'componentNames': component_names
     }
-    F = fig.Figure(view_url='gs://figurl/volumeview-3', data=data)
+    F = fig.Figure(view_url='gs://figurl/volumeview-4', data=data)
     return F

@@ -2,7 +2,7 @@
 
 set -ex
 
-TARGET=gs://figurl/volumeview-3
+TARGET=gs://figurl/volumeview-4
 
 yarn build
 

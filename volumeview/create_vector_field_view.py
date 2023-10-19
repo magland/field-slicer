@@ -19,5 +19,5 @@ def create_vector_field_view(v: np.ndarray):
         'dataUri': data_uri,
         'dataShape': v.shape
     }
-    F = fig.Figure(view_url='gs://figurl/volumeview-3', data=data)
+    F = fig.Figure(view_url='gs://figurl/volumeview-4', data=data)
     return F

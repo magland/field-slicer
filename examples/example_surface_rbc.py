@@ -20,7 +20,7 @@ def main():
     url = F.url(label='red blood cell')
     print(url)
     # 5/6/2022
-    # https://figurl.org/f?v=gs://figurl/volumeview-3&d=ipfs://bafkreiflucxhbflk7s4v5l7coxj7prixec5a5z65gia4atpvuh2wtx6fxa&label=red%20blood%20cell
+    # https://figurl.org/f?v=gs://figurl/volumeview-4&d=ipfs://bafkreiflucxhbflk7s4v5l7coxj7prixec5a5z65gia4atpvuh2wtx6fxa&label=red%20blood%20cell
 
 if __name__ == '__main__':
     main()
